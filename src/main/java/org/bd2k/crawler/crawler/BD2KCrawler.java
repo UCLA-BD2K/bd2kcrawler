@@ -1,4 +1,4 @@
-package org.bd2kccc.crawler.crawler;
+package org.bd2k.crawler.crawler;
 
 import edu.uci.ics.crawler4j.crawler.WebCrawler;
 

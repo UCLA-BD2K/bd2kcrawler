@@ -1,4 +1,4 @@
-package org.bd2kccc.crawler.service;
+package org.bd2k.crawler.service;
 
 /**
  * Interface for the service to handle needs for previously archived 

@@ -1,6 +1,6 @@
-package org.bd2kccc.crawler.service;
+package org.bd2k.crawler.service;
 
-import org.bd2kccc.crawler.model.ArchivedPage;
+import org.bd2k.crawler.model.ArchivedPage;
 import org.springframework.stereotype.Service;
 
 @Service("archiveService")

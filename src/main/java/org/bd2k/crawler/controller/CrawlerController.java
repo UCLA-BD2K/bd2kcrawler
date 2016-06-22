@@ -1,6 +1,6 @@
-package org.bd2kccc.crawler.controller;
+package org.bd2k.crawler.controller;
 
-import org.bd2kccc.crawler.service.ArchiveService;
+import org.bd2k.crawler.service.ArchiveService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Controller;

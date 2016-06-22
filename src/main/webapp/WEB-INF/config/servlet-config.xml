@@ -13,7 +13,7 @@
 	
 	<!-- location of components -->
 	<!-- <context:component-scan base-package="org.bd2kccc.crawler.controller"></context:component-scan> -->
-	<context:component-scan base-package="org.bd2kccc.crawler" />
+	<context:component-scan base-package="org.bd2k.crawler" />
 	
 	<!--  view resolver, JSPs -->
 	<bean class="org.springframework.web.servlet.view.InternalResourceViewResolver" 

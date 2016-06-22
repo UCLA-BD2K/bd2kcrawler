@@ -1,4 +1,4 @@
-package org.bd2kccc.crawler.model;
+package org.bd2k.crawler.model;
 
 public class ArchivedPage {
 	private int pageId;
