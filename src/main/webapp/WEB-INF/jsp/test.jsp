@@ -5,7 +5,12 @@
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <title>Test Page</title>
-
+<style>
+.section {
+	width:100%;
+	padding:50px;
+}
+</style>
 </head>
 <body>
 
@@ -14,15 +19,19 @@
 		<h2>By default, a ping will be sent to service and model to test functionality.</h2>
 		
 		<div>
-			<div id="crawl-url">
-				<form method="GET" id="crawl-url-form">
-					<input id="crawl-url-input" type="text" name="url" />
-					<input type="submit" value="Crawl URL" />
-				</form>
+			<div class="section">
+				<div id="crawl-url">
+					<h3>Crawl individual Site based on ID/URL</h3>
+					<form method="GET" id="crawl-url-form">
+						<input id="crawl-url-input" type="text" name="url" />
+						<input type="submit" value="Crawl URL" />
+					</form>
+				</div>
 			</div>
-			
-			<div id="crawl-site">
-				TODO: crawl an entire site
+			<div class="section">
+				<div id="crawl-site">
+					<h3>TODO: crawl an entire site</h3>
+				</div>
 			</div>
 		</div>
 	</div>
