@@ -1,23 +1,21 @@
 package org.bd2k.crawler.controller;
 
-import org.bd2k.crawler.service.ArchiveService;
+import org.bd2k.crawler.service.PageService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
 /**
  * Controller that handles requests for site pages.
- * Not to be confused with CrawlerAPIController, which exposes endpoints.
+ * Not to be confused with CrawlerAPIController, which exposes API endpoints.
  * @author allengong
  *
  */
 @Controller
-public class CrawlerController {
+public class CrawlerSiteController {
 	@Autowired
-	@Qualifier(value="archiveService")
-	private ArchiveService archiveService;
+	private PageService archiveService;
 
 	/* for testing functionality */
 	@RequestMapping(value="/test", method=RequestMethod.GET)
@@ -27,4 +25,11 @@ public class CrawlerController {
 		
 		return "test";
 	}
+	
+	/* homepage */
+	@RequestMapping(value="/", method=RequestMethod.GET) 
+	public String getHomePage() {
+		return "index";
+	}
 }
+

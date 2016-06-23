@@ -1,24 +1,26 @@
-package org.bd2k.crawler.dao;
+package org.bd2k.crawler.model;
 
 import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.mapping.Document;
 
 /**
  * Entity representing a document for a webpage.
  * @author allengong
  *
  */
+@Document(collection="Pages")
 public class Page {
 	
 	@Id
 	private String id;
 	
-	private String pageURl;
+	String pageURL;
 
 	/* ctrs */
 	public Page() {}
 	
 	public Page(String URL) {
-		this.pageURl = URL;
+		this.pageURL = URL;
 	}
 	
 	/* Getters and setters */
@@ -31,11 +33,21 @@ public class Page {
 	}
 
 	public String getPageURl() {
-		return pageURl;
+		return pageURL;
 	}
 
 	public void setPageURl(String pageURl) {
-		this.pageURl = pageURl;
+		this.pageURL = pageURL;
+	}
+	
+	@Override
+	public String toString() {
+		return String.format("[ id: %s, pageURL:%s]", this.id, this.pageURL);
+	}
+	
+	//functionality test
+	public String ping() {
+		return "[Page Model] I am alive";
 	}
 	
 }

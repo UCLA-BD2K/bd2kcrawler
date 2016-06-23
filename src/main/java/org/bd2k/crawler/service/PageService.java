@@ -7,8 +7,8 @@ package org.bd2k.crawler.service;
  * @author allengong
  *
  */
-public interface ArchiveService {
+public interface PageService {
 	
 	public String ping();
-
+	
 }
