@@ -14,13 +14,13 @@ public class Page {
 	@Id
 	private String id;
 	
-	private String pageURL;
+	private String url;
 
 	/* ctrs */
 	public Page() {}
 	
 	public Page(String url) {
-		this.pageURL = url;
+		this.url = url;
 	}
 	
 	/* Getters and setters */
@@ -32,17 +32,17 @@ public class Page {
 		this.id = id;
 	}
 
-	public String getPageURl() {
-		return pageURL;
+	public String getURL() {
+		return url;
 	}
 
 	public void setPageURl(String url) {
-		this.pageURL = url;
+		this.url = url;
 	}
 	
 	@Override
 	public String toString() {
-		return String.format("[ id: %s, pageURL:%s]", this.id, this.pageURL);
+		return String.format("[ id: %s, pageURL:%s]", this.id, this.url);
 	}
 	
 	//connectivity test

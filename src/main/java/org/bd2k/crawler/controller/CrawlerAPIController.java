@@ -9,13 +9,13 @@ import org.springframework.context.support.AbstractApplicationContext;
 import org.springframework.data.mongodb.core.MongoOperations;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
- * Rest controller for making external API requests.
+ * Rest controller for making external API requests. Primarily a test 
+ * controller for interal use.
  * @author allengong
  *
  */
@@ -27,17 +27,7 @@ public class CrawlerAPIController {
 	@Autowired
 	private PageService pageServce;
 	
-	/*
-	 * Endpoint for checking a single website for changes.
-	 */
-	@RequestMapping(value="/news/update/{id}")
-	public String getUpdateForId(@PathVariable String id) {
-		
-		//id = URL?
-		System.out.println("woo" + id);
-		
-		return "test";
-	}
+	/* sanity check routes */
 	
 	@RequestMapping(value="/testInsert")
 	public Page insertIntoDB(@RequestParam("url")String url) {
@@ -51,15 +41,14 @@ public class CrawlerAPIController {
 		//move below to service
 		ApplicationContext ctx = new AnnotationConfigApplicationContext(org.bd2k.crawler.config.MongoConfig.class);
 		MongoOperations mongoOperation = (MongoOperations) ctx.getBean("mongoTemplate");
-		
-		//Page dummyPage = new Page("facebook.com");
-		//mongoOperation.save(dummyPage);
+		//System.out.println("inserting facebook");
+//		Page dummyPage = new Page("facebook.com");
+//		mongoOperation.save(dummyPage);
 
-		Query q = new Query(Criteria.where("pageURL").is(url));
+		Query q = new Query(Criteria.where("url").is(url));
 		Page p = mongoOperation.findOne(q, Page.class);
 		
 		((AbstractApplicationContext) ctx).close();
 		return p;
 	}
-
 }
