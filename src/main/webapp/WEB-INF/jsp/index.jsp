@@ -6,15 +6,7 @@
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <title>BD2KCrawler | Homepage</title>
 <link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" rel="stylesheet" type="text/css" />
-<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
-
-<style>
-	#login-form {
-		border:2px solid #d3d3d3;
-		border-radius: 5px;
-		padding:15px;
-	}
-</style>
+<link href="resources/css/site.css" rel="stylesheet" type="text/css" />
 </head>
 <body>
 	<div class="container-fluid">
@@ -60,4 +52,8 @@
           </div>
 	</div>
 </body>
+
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.2.4/jquery.min.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
+
 </html>

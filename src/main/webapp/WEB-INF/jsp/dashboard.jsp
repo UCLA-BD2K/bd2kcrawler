@@ -7,13 +7,7 @@
 <title>Dashboard | BD2KCrawler</title>
 
 <link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" rel="stylesheet" type="text/css" />
-<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
-
-<style>
-	#search-results {
-		min-height:400px
-	}
-</style>
+<link href="resources/css/site.css" rel="stylesheet" type="text/css" />
 
 </head>
 
@@ -34,23 +28,31 @@
               <li class="active"><a href="index">Home</a></li>
             </ul>
           </div>
-          
+         
           <div class="container">
-          	<div class="header">
-          		<div class="row center">
-          			<div class="col-sm-10">
-          				<form action="" method="">
-          					<label for="search">Search by URL, or "all"</label>
-          					<input class="form-group" id="search" />
-          				</form>
+          <div class="row">
+          	<div id="search-form" class="col-sm-12">
+          		<form action="" method="">
+          			<label for="search">Search by URL, or "all"</label>
+          			<input class="form-group" id="search" />
+          		</form>
+          	</div>
+			</div>
+			<div class="row">	
+          			<div class="col-sm-12">
           				<div id="search-results">
           					Results will go here.
           				</div>
           			</div>
           		</div>
           	</div>
+          	</div>
           </div>
 	</div>
 
 </body>
+
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.2.4/jquery.min.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
+
 </html>

@@ -21,6 +21,9 @@
 	<bean class="org.springframework.web.servlet.view.InternalResourceViewResolver" 
 	 p:prefix="/WEB-INF/jsp/" p:suffix=".jsp" /> 
 	
+	<!-- resource location --> 
+	<mvc:resources mapping="/resources/**" location="/resources/" />
+	
 	<!-- bean for mongodb, use test db -->
 	<mongo:mongo host="127.0.0.1" port="27017" />
 	<mongo:db-factory dbname="test" />
