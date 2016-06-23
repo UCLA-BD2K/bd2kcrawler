@@ -14,13 +14,13 @@ public class Page {
 	@Id
 	private String id;
 	
-	String pageURL;
+	private String pageURL;
 
 	/* ctrs */
 	public Page() {}
 	
-	public Page(String URL) {
-		this.pageURL = URL;
+	public Page(String url) {
+		this.pageURL = url;
 	}
 	
 	/* Getters and setters */
@@ -36,8 +36,8 @@ public class Page {
 		return pageURL;
 	}
 
-	public void setPageURl(String pageURl) {
-		this.pageURL = pageURL;
+	public void setPageURl(String url) {
+		this.pageURL = url;
 	}
 	
 	@Override
@@ -45,7 +45,7 @@ public class Page {
 		return String.format("[ id: %s, pageURL:%s]", this.id, this.pageURL);
 	}
 	
-	//functionality test
+	//connectivity test
 	public String ping() {
 		return "[Page Model] I am alive";
 	}

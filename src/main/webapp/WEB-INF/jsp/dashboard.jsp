@@ -4,19 +4,21 @@
 <html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-<title>BD2KCrawler | Homepage</title>
+<title>Dashboard | BD2KCrawler</title>
+
 <link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" rel="stylesheet" type="text/css" />
 <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
 
 <style>
-	#login-form {
-		border:2px solid #d3d3d3;
-		border-radius: 5px;
-		padding:15px;
+	#search-results {
+		min-height:400px
 	}
 </style>
+
 </head>
+
 <body>
+
 	<div class="container-fluid">
 		<div class="navbar-header">
             <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
@@ -31,33 +33,24 @@
             <ul class="nav navbar-nav">
               <li class="active"><a href="index">Home</a></li>
             </ul>
-            <ul class="nav navbar-nav navbar-right">
-              <li class="active"><a href="#">Login</a></li>
-            </ul>
           </div>
           
           <div class="container">
-          	<div class="row">
-          		<div class="col-sm-3"></div>
-          		
-          		<div class="col-sm-6">
-          			<div id="login-form">
-          				<h4>Login:</h4>
-          				<form method="POST" action="login">
-          					<label for="username">Username:</label>
-          					<input class="form-control" name="username" type="text" id="username" />
-          					<label for="pass">Password:</label>
-          					<input class="form-control" name="password" type="password" id="pass" />
-          					<br />
-          					<input class="form-control" type="submit" value="Login" />
-          					<input class="form-control" type="reset" value="Clear" />
+          	<div class="header">
+          		<div class="row center">
+          			<div class="col-sm-10">
+          				<form action="" method="">
+          					<label for="search">Search by URL, or "all"</label>
+          					<input class="form-group" id="search" />
           				</form>
+          				<div id="search-results">
+          					Results will go here.
+          				</div>
           			</div>
           		</div>
-          		
-          		<div class="col-sm-3"></div>
           	</div>
           </div>
 	</div>
+
 </body>
 </html>

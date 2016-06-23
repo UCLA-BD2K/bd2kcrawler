@@ -1,6 +1,8 @@
 package org.bd2k.crawler.controller;
 
 import org.bd2k.crawler.model.Page;
+import org.bd2k.crawler.service.PageService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import org.springframework.context.support.AbstractApplicationContext;
@@ -22,8 +24,8 @@ public class CrawlerAPIController {
 	
 	//private BD2KCrawler crawler;	//singleton instance used to call crawl ops, probably belongs in service
 	
-	//@Autowired
-	//private PageRepo pageRepo;
+	@Autowired
+	private PageService pageServce;
 	
 	/*
 	 * Endpoint for checking a single website for changes.
@@ -45,7 +47,8 @@ public class CrawlerAPIController {
 	
 	@RequestMapping(value="/testGet")
 	public Page getPageFromDB(@RequestParam("url") String url) {
-		//pageRepo.findPageByURL(url);
+		
+		//move below to service
 		ApplicationContext ctx = new AnnotationConfigApplicationContext(org.bd2k.crawler.config.MongoConfig.class);
 		MongoOperations mongoOperation = (MongoOperations) ctx.getBean("mongoTemplate");
 		

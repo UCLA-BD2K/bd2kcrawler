@@ -1,5 +1,9 @@
 package org.bd2k.crawler.controller;
 
+import javax.servlet.http.HttpServletRequest;
+
+import org.bd2k.crawler.model.User;
+import org.bd2k.crawler.service.AuthService;
 import org.bd2k.crawler.service.PageService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -16,6 +20,9 @@ import org.springframework.web.bind.annotation.RequestMethod;
 public class CrawlerSiteController {
 	@Autowired
 	private PageService archiveService;
+	
+	@Autowired
+	private AuthService authService;
 
 	/* for testing functionality */
 	@RequestMapping(value="/test", method=RequestMethod.GET)
@@ -27,9 +34,29 @@ public class CrawlerSiteController {
 	}
 	
 	/* homepage */
-	@RequestMapping(value="/", method=RequestMethod.GET) 
+	@RequestMapping(value="/index", method=RequestMethod.GET) 
 	public String getHomePage() {
 		return "index";
+	}
+	
+	/* dashboard */
+	@RequestMapping(value="/dashboard", method=RequestMethod.GET) 
+	public String getDashboardPage() {
+		return "dashboard";
+	}
+	
+	
+	// other
+	
+	@RequestMapping(value="/login", method=RequestMethod.POST) 
+	public String loginUser(HttpServletRequest req) {
+		System.out.println("loginUser()");
+		
+		if(authService.verifyUser(new User(req.getParameter("username"),
+				req.getParameter("password"))))
+			return "redirect:dashboard";
+			
+		return "redirect:index";	//fail auth
 	}
 }
 
