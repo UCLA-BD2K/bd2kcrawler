@@ -37,26 +37,38 @@
           	<div id="search-form" class="col-sm-12">
           		<div class="">
           			<h4>Filter results below:</h4>
-          			<form action="" method="">
+          			<form action="" method="GET">
           				<div class="form-group">
           					<label for="center-select">Center:</label> 
           					<select name="centerID" id="center-select">
-          						<option vale="all">All</option>
+          						<option value="all">All</option>
           						<c:forEach items="${bd2kCenters}" var="center">
           							<option value="${center}">${center}</option>
           						</c:forEach>
           					</select>
           				</div>
           				<div class="form-group">
+          					<label for="center-select">Grant:</label> 
+          					<select name="grant" id="center-select">
+          						<option value="any">Any</option>
+          						<c:forEach items="${grantList}" var="grant">
+          							<option value="${grant}">${grant}</option>
+          						</c:forEach>
+          					</select>
+          				</div>
+          				<div class="form-group">
           					<label class="radio-inline">
-          						<input type="radio" name="type">Sites
+          						<input type="radio" value="sites" name="type">Sites
           					</label>
           					<label class="radio-inline">
-          						<input type="radio" name="type">Publications
+          						<input type="radio" value="publications' name="type">Publications
           					</label>
           					<label class="radio-inline">
-          						<input type="radio" name="type" checked="checked">All
+          						<input type="radio" value="all" name="type" checked="checked">All
           					</label>
+          				</div>
+          				<div class="form-group">
+          					<input type="submit" value="Search" />
           				</div>
           			</form>
           		</div>
@@ -71,9 +83,8 @@
           			</div>
           		</div>
           	</div>
-          	</div>
-          </div>
-	</div>
+       </div>
+  
 
 </body>
 

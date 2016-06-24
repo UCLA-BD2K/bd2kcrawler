@@ -9,6 +9,9 @@
 #search-form {
 	padding:5px;
 }
-#search-results {
-		min-height:400px
+#search-results, #digest-result-container {
+	min-height:400px
+}
+#digest-result-container {
+	padding:15px
 }

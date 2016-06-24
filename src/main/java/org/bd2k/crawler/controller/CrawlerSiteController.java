@@ -65,11 +65,22 @@ public class CrawlerSiteController {
 				"HeartBD2K", "KnowEng", "LINCS-DCIC", "LINCS-TG", "MD2K", "Mobilize",
 				"PIC-SURE"};
 		
+		String[] grantList = { "EB020406", "HG007990", "HG008540", "AI117925", 
+				"AI117924", "EB020403", "GM114833", "GM114838", "HL127624", 
+				"HL127366", "EB020404", "EB020405", "HG007963"};
+		
 		model.addAttribute("bd2kCenters", bd2kCenters);
+		model.addAttribute("grantList", grantList);
 		
 		return "dashboard";
 	}
 	
+	/* results */
+	@RequestMapping(value="/digestResults")
+	public String getDigestResults() {
+		
+		return "digest";
+	}
 	
 	// other
 	//should be in its own controller
