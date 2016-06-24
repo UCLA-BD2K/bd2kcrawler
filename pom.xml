@@ -73,6 +73,11 @@
         <artifactId>spring-security-web</artifactId>
         <version>4.1.0.RELEASE</version>
     </dependency>
+    <dependency>
+    	<groupId>com.madgag</groupId>
+    	<artifactId>util-diff</artifactId>
+    	<version>1.33</version>
+    </dependency>
   </dependencies>
   <build>
     <finalName>BD2KCrawler</finalName>
