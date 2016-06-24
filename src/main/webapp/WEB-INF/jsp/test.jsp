@@ -33,6 +33,7 @@
 					<h3>TODO: crawl an entire site</h3>
 				</div>
 			</div>
+			<a href="index">dummy link for crawler</a>
 		</div>
 	</div>
 

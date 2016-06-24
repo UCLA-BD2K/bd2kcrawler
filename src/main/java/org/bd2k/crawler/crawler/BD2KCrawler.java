@@ -35,22 +35,27 @@ public class BD2KCrawler extends WebCrawler {
     private final static Pattern FILTERS = Pattern.compile(".*(\\.(css|js|gif|jpg"
             + "|png|mp3|mp3|zip|gz))$");
     
-    private String crawlID;	
-    private String domain;		//similar to rootURL from previous crawler
-    private String[] seedURLs;
-    private String[] excludedURLs;
+    
+    //members
+    private static String crawlID;	
+    private static String domain;		//similar to rootURL from previous crawler
+    private static String[] seedURLs;
+    private static String[] excludedURLs;
+    
+    //controller to expose control over the crawler from outside
+    CrawlController controller;
     
     //for generating timestamps
-    private DateFormat df = new SimpleDateFormat("EEE, d MMM yyyy HH:mm:ss Z");
+    private DateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ");
     
     public BD2KCrawler() {}	//should be avoided, or used in unison for initDefault()
  
     public BD2KCrawler(String crawlID, String domain, String[] seedURLs, String[] excludedURLs) {
 		super();
-		this.crawlID = crawlID;
-		this.domain = domain;
-		this.seedURLs = seedURLs;
-		this.excludedURLs = excludedURLs;
+		BD2KCrawler.crawlID = crawlID;
+		BD2KCrawler.domain = domain;
+		BD2KCrawler.seedURLs = seedURLs;
+		BD2KCrawler.excludedURLs = excludedURLs;
 	}
     
     /**
@@ -66,15 +71,17 @@ public class BD2KCrawler extends WebCrawler {
      @Override
      public boolean shouldVisit(Page referringPage, WebURL url) {
     	 System.out.println("Coming from page: " + referringPage.getWebURL());
-    	 System.out.println("deciding to visit page: " + url);
+    	 
+    	 System.out.println("deciding whether to visit page: " + url);
+    	 
          String href = url.getURL().toLowerCase();	
          
          //skip filter file types by default (e.g. css, js, zip, etc.)
          if(FILTERS.matcher(href).matches())
         	 return false;
-         System.out.println("Starts with domain: " + domain);
+         
          //only check for files in the domain (e.g. https://bd2kccc.org)
-         if(!href.startsWith(this.domain))
+         if(!href.startsWith(BD2KCrawler.domain))
         	 return false;
          
          //skip specified urls to exclude
@@ -101,10 +108,17 @@ public class BD2KCrawler extends WebCrawler {
              String html = htmlParseData.getHtml();
              Set<WebURL> links = htmlParseData.getOutgoingUrls();
 
-             System.out.println("Text length: " + text.length());
-             System.out.println("Html length: " + html.length());
-             System.out.println("Number of outgoing links: " + links.size());
+             //System.out.println("Text length: " + text.length());
+             //System.out.println("Html length: " + html.length());
+             //System.out.println("Number of outgoing links: " + links.size());
+             System.out.println("results of crawl:");
+             System.out.println(text);
+             System.out.println("doc id " + page.getWebURL().getDocid() );
+             
+             //get a diff
          }
+         
+         //TODO, logic to access archiveService and to start logging important things
     }
     
 
@@ -113,7 +127,7 @@ public class BD2KCrawler extends WebCrawler {
 	}
 
 	public void setDomain(String domain) {
-		this.domain = domain;
+		BD2KCrawler.domain = domain;
 	}
 
 	/* setters and getters */
@@ -122,7 +136,7 @@ public class BD2KCrawler extends WebCrawler {
 	}
 
 	public void setCrawlID(String crawlID) {
-		this.crawlID = crawlID;
+		BD2KCrawler.crawlID = crawlID;
 	}
 
 	public String[] getSeedURLs() {
@@ -130,7 +144,7 @@ public class BD2KCrawler extends WebCrawler {
 	}
 
 	public void setSeedURLs(String[] seedURLs) {
-		this.seedURLs = seedURLs;
+		BD2KCrawler.seedURLs = seedURLs;
 	}
 
 	public String[] getExcludedURLs() {
@@ -138,7 +152,7 @@ public class BD2KCrawler extends WebCrawler {
 	}
 
 	public void setExcludedURLs(String[] excludedURLs) {
-		this.excludedURLs = excludedURLs;
+		BD2KCrawler.excludedURLs = excludedURLs;
 	}
 	
 	
@@ -159,7 +173,7 @@ public class BD2KCrawler extends WebCrawler {
     	PageFetcher pf = new PageFetcher(config);
     	RobotstxtConfig robotstxtConfig = new RobotstxtConfig();
     	RobotstxtServer robotstxtServer = new RobotstxtServer(robotstxtConfig, pf);
-    	CrawlController controller = new CrawlController(config, pf, robotstxtServer);
+    	controller = new CrawlController(config, pf, robotstxtServer);
     	
     	//add the seeds to indicate where crawler should start
     	for(int i = 0; i < seedURLs.length; i++)
@@ -169,5 +183,18 @@ public class BD2KCrawler extends WebCrawler {
     	controller.start(BD2KCrawler.class, NUM_CRAWLERS);
     	
     	System.out.println("[BD2KCrawler] Finished crawling!");
+    }
+    
+    //allow outsiders to suggest that the crawler should stop
+    public boolean stopCrawling() {
+    	
+    	if(controller == null)
+    		return false;
+    	
+    	//can implement this in any way, for simplicity we will just stop
+    	controller.shutdown();
+    	controller.waitUntilFinish();
+    	
+    	return true;
     }
 }

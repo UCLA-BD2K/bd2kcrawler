@@ -24,6 +24,9 @@
 	<!-- resource location --> 
 	<mvc:resources mapping="/resources/**" location="/resources/" />
 	
+	<!-- Properties location -->
+	<context:property-placeholder location="classpath:app.properties"/>
+	
 	<!-- bean for mongodb, use test db -->
 	<mongo:mongo host="127.0.0.1" port="27017" />
 	<mongo:db-factory dbname="BD2KCrawlerDB" />

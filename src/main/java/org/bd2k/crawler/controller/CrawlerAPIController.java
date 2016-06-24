@@ -1,9 +1,11 @@
 package org.bd2k.crawler.controller;
 
 import org.bd2k.crawler.crawler.BD2KCrawler;
+import org.bd2k.crawler.crawler.Digester;
 import org.bd2k.crawler.model.Page;
 import org.bd2k.crawler.service.PageService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import org.springframework.context.support.AbstractApplicationContext;
@@ -28,7 +30,22 @@ public class CrawlerAPIController {
 	@Autowired
 	private PageService pageServce;
 	
+	//single instance crawler
+	private BD2KCrawler crawler;
+		
 	/* sanity check routes */
+	@Value("${db.host}") 
+	String val;
+	
+	@RequestMapping(value="/testValue")
+	public String getValue() {
+		
+		Digester dig = new Digester("hello worlds", "hello my world");
+		//System.out.println(dig.computeSemanticDiff());
+		
+		//return val;
+		return dig.computeHTMLDiff();
+	}
 	
 	@RequestMapping(value="/testInsert")
 	public Page insertIntoDB(@RequestParam("url")String url) {
@@ -58,7 +75,7 @@ public class CrawlerAPIController {
 		//BD2KCrawler crawler = new BD2KCrawler();
 		String[] seedURLs = {url};
 		String[] excludedURLs = {};
-		BD2KCrawler crawler = new BD2KCrawler("", "https://bd2kccc.org", seedURLs,
+		crawler = new BD2KCrawler("", "https://bd2kccc.org", seedURLs,
 				excludedURLs);
 		crawler.setDomain("https://bd2kccc.org");
 		crawler.setSeedURLs(seedURLs);
@@ -72,5 +89,12 @@ public class CrawlerAPIController {
 		}
 		
 		return "everything went OK";
+	}
+	
+	@RequestMapping(value="/testCrawl/stop")
+	public String testStopCrawler() {
+		crawler.stopCrawling();	//may need crawler to be a static member
+		
+		return "crawler gracefully stopped.";
 	}
 }
