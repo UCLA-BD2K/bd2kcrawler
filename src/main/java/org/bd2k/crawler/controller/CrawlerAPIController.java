@@ -1,5 +1,6 @@
 package org.bd2k.crawler.controller;
 
+import org.bd2k.crawler.crawler.BD2KCrawler;
 import org.bd2k.crawler.model.Page;
 import org.bd2k.crawler.service.PageService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -50,5 +51,26 @@ public class CrawlerAPIController {
 		
 		((AbstractApplicationContext) ctx).close();
 		return p;
+	}
+	
+	@RequestMapping(value="/testCrawl")
+	public String crawlPage(@RequestParam("url") String url) {
+		//BD2KCrawler crawler = new BD2KCrawler();
+		String[] seedURLs = {url};
+		String[] excludedURLs = {};
+		BD2KCrawler crawler = new BD2KCrawler("", "https://bd2kccc.org", seedURLs,
+				excludedURLs);
+		crawler.setDomain("https://bd2kccc.org");
+		crawler.setSeedURLs(seedURLs);
+		
+		try {
+			crawler.crawl();
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			System.out.println("error in crawl()");
+			e.printStackTrace();
+		}
+		
+		return "everything went OK";
 	}
 }
