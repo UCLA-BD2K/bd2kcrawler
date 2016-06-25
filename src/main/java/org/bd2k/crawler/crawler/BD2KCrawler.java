@@ -37,7 +37,7 @@ public class BD2KCrawler extends WebCrawler {
     
     
     //members
-    private static String crawlID;	
+    private static String centerID;	
     private static String domain;		//similar to rootURL from previous crawler
     private static String[] seedURLs;
     private static String[] excludedURLs;
@@ -50,9 +50,9 @@ public class BD2KCrawler extends WebCrawler {
     
     public BD2KCrawler() {}	//should be avoided, or used in unison for initDefault()
  
-    public BD2KCrawler(String crawlID, String domain, String[] seedURLs, String[] excludedURLs) {
+    public BD2KCrawler(String centerID, String domain, String[] seedURLs, String[] excludedURLs) {
 		super();
-		BD2KCrawler.crawlID = crawlID;
+		BD2KCrawler.centerID = centerID;
 		BD2KCrawler.domain = domain;
 		BD2KCrawler.seedURLs = seedURLs;
 		BD2KCrawler.excludedURLs = excludedURLs;
@@ -111,11 +111,13 @@ public class BD2KCrawler extends WebCrawler {
              //System.out.println("Text length: " + text.length());
              //System.out.println("Html length: " + html.length());
              //System.out.println("Number of outgoing links: " + links.size());
+             
+             System.out.println("Crawling centerid: " + getCenterID());
              System.out.println("results of crawl:");
              System.out.println(text);
              System.out.println("doc id " + page.getWebURL().getDocid() );
              
-             //get a diff
+             //get a diff -- TODO and store the Page into mongo
          }
          
          //TODO, logic to access archiveService and to start logging important things
@@ -131,12 +133,12 @@ public class BD2KCrawler extends WebCrawler {
 	}
 
 	/* setters and getters */
-	public String getCrawlID() {
-		return crawlID;
+	public String getCenterID() {
+		return centerID;
 	}
 
-	public void setCrawlID(String crawlID) {
-		BD2KCrawler.crawlID = crawlID;
+	public void setCrawlID(String centerID) {
+		BD2KCrawler.centerID = centerID;
 	}
 
 	public String[] getSeedURLs() {
@@ -182,6 +184,7 @@ public class BD2KCrawler extends WebCrawler {
     	//start the crawler, blocks here until completion
     	controller.start(BD2KCrawler.class, NUM_CRAWLERS);
     	
+    	//only gets here when no more crawling threads working
     	System.out.println("[BD2KCrawler] Finished crawling!");
     }
     
