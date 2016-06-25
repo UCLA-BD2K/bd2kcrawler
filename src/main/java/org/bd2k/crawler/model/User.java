@@ -15,27 +15,18 @@ public class User {
 	
 	private String firstName;
 	private String lastName;
-	private String username;
 	private String password;
 	private String email;
-	
-//	private String lastCrawlTime;
-//	private String lastDiff;
-//	private String pageContent;
-//	private String URL;
-//	private String pageID;
-	
+		
 	// cstrs
 	public User() {}
-	public User(String un, String pass) {
-		username = un;
+	public User(String em, String pass) {
+		email = em;
 		password = pass;
 	}
-	public User(String fname, String lname, String un, String pass,
-			String emailAdd) {
+	public User(String fname, String lname, String pass, String emailAdd) {
 		firstName = fname;
 		lastName = lname;
-		username = un;
 		password = pass;
 		email = emailAdd;
 	}
@@ -61,12 +52,6 @@ public class User {
 	public void setLastName(String lastName) {
 		this.lastName = lastName;
 	}
-	public String getUsername() {
-		return username;
-	}
-	public void setUsername(String username) {
-		this.username = username;
-	}
 	public String getPassword() {
 		return password;
 	}
@@ -84,7 +69,7 @@ public class User {
 	
 	@Override
 	public String toString() {
-		return "[user] " + this.username + " < " + this.firstName + " " + 
+		return "[user] " + this.email + " < " + this.firstName + " " + 
 				this.lastName + " >";
 	}
 }

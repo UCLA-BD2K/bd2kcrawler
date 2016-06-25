@@ -1,8 +1,12 @@
 package org.bd2k.crawler.controller;
 
+import java.util.List;
+
 import org.bd2k.crawler.crawler.BD2KCrawler;
 import org.bd2k.crawler.crawler.Digester;
+import org.bd2k.crawler.model.Center;
 import org.bd2k.crawler.model.Page;
+import org.bd2k.crawler.service.CenterService;
 import org.bd2k.crawler.service.PageService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -18,7 +22,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 /**
  * Rest controller for making external API requests. Primarily a test 
- * controller for interal use.
+ * controller for internal use.
  * @author allengong
  *
  */
@@ -29,6 +33,9 @@ public class CrawlerAPIController {
 	
 	@Autowired
 	private PageService pageServce;
+	
+	@Autowired
+	private CenterService centerService;
 	
 	//single instance crawler
 	private BD2KCrawler crawler;
@@ -44,6 +51,12 @@ public class CrawlerAPIController {
 		//System.out.println(dig.computeSemanticDiff());
 		
 		//return val;
+		List<Center> centers = centerService.getAllCenters();
+		System.out.println("got the centers");
+		for(Center c : centers)
+			System.out.println("[Center]: " + c.getCenterID());
+		
+		
 		return dig.computeHTMLDiff();
 	}
 	
