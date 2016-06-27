@@ -1,9 +1,8 @@
 package org.bd2k.crawler.controller;
 
-import java.util.HashMap;
-
 import javax.servlet.http.HttpServletRequest;
 
+import org.bd2k.crawler.model.Page;
 import org.bd2k.crawler.model.User;
 import org.bd2k.crawler.service.AuthService;
 import org.bd2k.crawler.service.PageService;
@@ -12,6 +11,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 
 /**
  * Controller that handles requests for site pages.
@@ -22,7 +22,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 @Controller
 public class CrawlerSiteController {
 	@Autowired
-	private PageService archiveService;
+	private PageService pageService;
 	
 	@Autowired
 	private AuthService authService;
@@ -31,7 +31,7 @@ public class CrawlerSiteController {
 	@RequestMapping(value="/test", method=RequestMethod.GET)
 	public String getTest() {
 		
-		System.out.println(archiveService.ping());
+		System.out.println(pageService.ping());
 		
 		return "test";
 	}
@@ -77,7 +77,11 @@ public class CrawlerSiteController {
 	
 	/* results */
 	@RequestMapping(value="/digestResults")
-	public String getDigestResults() {
+	public String getDigestResults(Model model, @RequestParam("id") String id) {
+		
+		//the id is the same as the value in _id
+		Page p = pageService.getPageByID(id);
+		model.addAttribute("page", p);
 		
 		return "digest";
 	}

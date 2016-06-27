@@ -35,16 +35,20 @@
           	</div> 
           	<br/>
           	<div class="panel panel-default" id="digest-result-container">
-          		<div class="panel-heading">Digest Results for: model.mongo_id</div>
+          		<div class="panel-heading">Digest Results for record: ${ page.getUrl() }</div>
           			
           		<div class="panel-body">
-          			<div>Document ID: model.mongo_id</div>
-          			<div>URL: model.url</div>
-          			<div>Last Crawl Time: model.lastCrawlTimestamp</div>
-          			<div>Results like in this <a target="_blank" href="https://neil.fraser.name/software/diff_match_patch/svn/trunk/demos/demo_diff.html">demo</a></div>
+          			<div>Document ID: ${ page.getId() }</div>
+          			<div>URL: ${ page.getUrl() }</div>
+          			<div>Last Crawl Time: ${ page.getLastCrawlTime() }</div>
+          			<!--  <div>Results like in this <a target="_blank" href="https://neil.fraser.name/software/diff_match_patch/svn/trunk/demos/demo_diff.html">demo</a></div> -->
+          			<br/>
+          			<div>--------------------------------------------------------------</div>
+          			<br/>
+          			<div>Results:</div> <br />
+          			<div>${ page.getLastDiff() }</div>
           		</div>
-          	</div>
-          		
+          	</div>     		
           </div>
        </div>
 </body>

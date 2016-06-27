@@ -2,8 +2,12 @@ package org.bd2k.crawler.crawler;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.Set;
 import java.util.regex.Pattern;
+
+import org.bd2k.crawler.service.PageService;
+import org.bd2k.crawler.service.PageServiceImpl;
 
 import edu.uci.ics.crawler4j.crawler.CrawlConfig;
 import edu.uci.ics.crawler4j.crawler.CrawlController;
@@ -27,6 +31,9 @@ import edu.uci.ics.crawler4j.url.WebURL;
  */
 public class BD2KCrawler extends WebCrawler {
 	
+	//cannot autowire because there will be instances to this class
+	private PageService pageService = new PageServiceImpl();
+	
 	//Important members, some borrowed from https://github.com/UCLA-BD2K/BD2K-Digester
 	private final static int NUM_CRAWLERS = 1;
     private final static String USER_AGENT_NAME = "UCLA BD2K";
@@ -35,7 +42,6 @@ public class BD2KCrawler extends WebCrawler {
     private final static Pattern FILTERS = Pattern.compile(".*(\\.(css|js|gif|jpg"
             + "|png|mp3|mp3|zip|gz))$");
     
-    
     //members
     private static String centerID;	
     private static String domain;		//similar to rootURL from previous crawler
@@ -43,7 +49,10 @@ public class BD2KCrawler extends WebCrawler {
     private static String[] excludedURLs;
     
     //controller to expose control over the crawler from outside
-    CrawlController controller;
+    private static CrawlController controller = null;
+    
+    //for use on sites that hold content in javascript, rather than html (LINCS-DCIC)
+    private static Set<String> visitedJS;
     
     //for generating timestamps
     private DateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ");
@@ -99,14 +108,15 @@ public class BD2KCrawler extends WebCrawler {
       */
      @Override
      public void visit(Page page) {
-         String url = page.getWebURL().getURL();
-         System.out.println("Parsing URL: " + url);
-
+    	 
+    	 String url = page.getWebURL().getURL();
+    	 System.out.println("[ Crawler ] Visiting url: " + url);
+    	 
          if (page.getParseData() instanceof HtmlParseData) {
              HtmlParseData htmlParseData = (HtmlParseData) page.getParseData();
              String text = htmlParseData.getText();
-             String html = htmlParseData.getHtml();
-             Set<WebURL> links = htmlParseData.getOutgoingUrls();
+             //String html = htmlParseData.getHtml();
+             //Set<WebURL> links = htmlParseData.getOutgoingUrls();
 
              //System.out.println("Text length: " + text.length());
              //System.out.println("Html length: " + html.length());
@@ -114,16 +124,56 @@ public class BD2KCrawler extends WebCrawler {
              
              System.out.println("Crawling centerid: " + getCenterID());
              System.out.println("results of crawl:");
-             System.out.println(text);
+             System.out.println(cleanText(text));
              System.out.println("doc id " + page.getWebURL().getDocid() );
+             System.out.println(df.format(new Date()));
              
-             //get a diff -- TODO and store the Page into mongo
+             //aggregate all needed information for DB storage
+             String lastCrawlTime = df.format(new Date());
+             String lastDiff = "";
+             //String previousCrawlContent;	//omitted, not really important
+             String currentContent = cleanText(text);
+
+             org.bd2k.crawler.model.Page p = pageService.getPageByURLandCenterId(url, BD2KCrawler.centerID);         
+            
+             //if there is already an entry in the DB for this url+center combo,
+             //need to compute a new diff first (here, HTML string representation)
+             if(p != null) {
+            	 
+            	 //check if there is no change, skip generating diff
+            	 if(!currentContent.equals(p.getCurrentContent())) {
+            		 Digester d = new Digester(p.getCurrentContent(), currentContent);
+                	 lastDiff = d.computeHTMLDiff(); 
+            	 }
+            	 else {
+            		 System.out.println("skip digester");
+            		 lastDiff = p.getLastDiff();	//same diff as before
+            	 }
+            	 
+            	 //store the updates
+            	 p.setLastCrawlTime(lastCrawlTime);
+            	 p.setLastDiff(lastDiff);
+            	 p.setCurrentContent(currentContent);
+            	 
+            	 pageService.savePage(p);
+             }
+             else {
+            	 
+            	 System.out.println("woooooo");
+            	 p = new org.bd2k.crawler.model.Page(
+            			 lastCrawlTime, 
+            			 lastDiff, 
+            			 currentContent,
+            			 url,
+            			 BD2KCrawler.centerID);
+            	 
+            	 pageService.savePage(p);
+             }       
          }
-         
-         //TODO, logic to access archiveService and to start logging important things
     }
     
-
+    /* setters and getters */
+     
     public String getDomain() {
 		return domain;
 	}
@@ -132,7 +182,6 @@ public class BD2KCrawler extends WebCrawler {
 		BD2KCrawler.domain = domain;
 	}
 
-	/* setters and getters */
 	public String getCenterID() {
 		return centerID;
 	}
@@ -159,7 +208,13 @@ public class BD2KCrawler extends WebCrawler {
 	
 	
 	/* Crawl handler, exposed as a public method */
-    public void crawl() throws Exception {
+    public static String crawl() throws Exception {
+    	
+    	//do a quick check to see if crawler is already running
+    	if(controller != null) {
+    		//return "Crawling in progress"
+    		return "Crawling already in progress...";
+    	}
     	
     	// Required for HTTPS sites; see http://stackoverflow.com/a/14884941
     	//SSL handshake fix
@@ -186,9 +241,11 @@ public class BD2KCrawler extends WebCrawler {
     	
     	//only gets here when no more crawling threads working
     	System.out.println("[BD2KCrawler] Finished crawling!");
+    	resetCrawler();	//reset controller, officially marks crawling over
+    	return "Crawl complete.";
     }
     
-    //allow outsiders to suggest that the crawler should stop
+    //allow outsiders to suggest that the crawler should stop - not tested yet
     public boolean stopCrawling() {
     	
     	if(controller == null)
@@ -199,5 +256,30 @@ public class BD2KCrawler extends WebCrawler {
     	controller.waitUntilFinish();
     	
     	return true;
+    }
+    
+    // get status of crawler
+    // 1=running, 0=idle
+    public int getCrawlerStatus() {
+    	
+    	if(controller != null) {
+    		return 1;	//crawler is running
+    	}
+    	
+    	return 0;	//crawler is idle
+    }
+    
+    // collapse extra whitespace, borrowed from https://github.com/UCLA-BD2K/BD2K-Digester
+    private String cleanText(String text) {
+        text = text.replaceAll("[ \\t]+", " "); // Collapse whitespace
+        text = text.replaceAll("[ \\t]*\\n+[ \\t]*", "\n"); // Trim whitespace
+        text = text.replaceAll("\\n+", "\n"); // Collapse empty lines
+        return text;
+    }
+    
+    // private function to reset crawler to a clean state
+    private static void resetCrawler() {
+    	controller = null;
+    	
     }
 }

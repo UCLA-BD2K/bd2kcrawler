@@ -1,13 +1,15 @@
 package org.bd2k.crawler.crawler;
+
 import java.util.LinkedList;
 
 import name.fraser.neil.plaintext.diff_match_patch;
 import name.fraser.neil.plaintext.diff_match_patch.Diff;
+
 /**
  * Represents a digester object that will perform a simple 
  * comparison between 2 Java Strings.
  * 
- * Utilizes google-diff-match-patch
+ * Utilizes a wrapper of Neil Fraser's diff-match-patch
  * @author allengong
  *
  */
@@ -52,7 +54,9 @@ public class Digester {
 	public String computeHTMLDiff() {
 		
 		LinkedList<Diff> diffs = digest.diff_main(this.stringOne, this.stringTwo);
+		//digest.diff_cleanupSemantic(diffs);
 		return digest.diff_prettyHtml(diffs);
+		
 
 	}
 	

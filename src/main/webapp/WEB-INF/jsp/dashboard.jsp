@@ -37,7 +37,7 @@
           	<div id="search-form" class="col-sm-12">
           		<div class="">
           			<h4>Filter results below:</h4>
-          			<form action="" method="GET">
+          			<form action="" method="GET" id="dashboard-form">
           				<div class="form-group">
           					<label for="center-select">Center:</label> 
           					<select name="centerID" id="center-select">
@@ -77,8 +77,9 @@
 			</div>
 			<div class="row">	
           			<div class="col-sm-12">
+          				Results:
           				<div id="search-results">
-          					Results will go here.
+          					
           				</div>
           			</div>
           		</div>
@@ -90,5 +91,45 @@
 
 <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.2.4/jquery.min.js"></script>
 <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
+
+<script>
+
+	//probably want to use some templating JS library like backbone
+	function generateListHTML(objects) {
+		var html = "<ul class-'list-group'>";
+		for(var i = 0; i < objects.length; i++) {		
+			html += 
+				"<li class='list-group-item'>" + 
+					"<a href='/BD2KCrawler/digestResults?id=" + objects[i].id + "'>" +
+						("[" + objects[i].lastCrawlTime + "]: " + objects[i].url) + 
+					"</a>" +
+				"</li>";
+		}
+		
+		html+= "</ul>";
+		return html;
+	}
+
+	$(function() {
+		
+		$('#dashboard-form').on("submit", function(e) {
+			e.preventDefault();
+			console.log("form submitted")
+			$.ajax({
+				url: "/BD2KCrawler/getPages?limit=" + 20 + "&offset=0" ,
+				success:function(data) {
+					console.log(data);
+					generateListHTML(data);
+					$('#search-results').html(generateListHTML(data));
+				},
+				error:function() {
+					
+				}
+			})
+		});
+	});
+	
+	
+</script>
 
 </html>

@@ -16,7 +16,6 @@ public class Page {
 	
 	private String lastCrawlTime;
 	private String lastDiff;
-	private String previousCrawlContent;
 	private String currentContent;
 	private String url;
 	private String centerID;
@@ -25,12 +24,11 @@ public class Page {
 	/* ctrs */
 	public Page() {}
 	
-	public Page(String lastCrawlTime, String lastDiff, String previousCrawlContent, String currentContent, String url,
+	public Page(String lastCrawlTime, String lastDiff, String currentContent, String url,
 			String centerID) {
 		super();
 		this.lastCrawlTime = lastCrawlTime;
 		this.lastDiff = lastDiff;
-		this.previousCrawlContent = previousCrawlContent;
 		this.currentContent = currentContent;
 		this.url = url;
 		this.centerID = centerID;
@@ -43,14 +41,6 @@ public class Page {
 
 	public void setId(String id) {
 		this.id = id;
-	}
-
-	public String getURL() {
-		return url;
-	}
-
-	public void setPageURl(String url) {
-		this.url = url;
 	}
 	
 	public String getLastCrawlTime() {
@@ -67,14 +57,6 @@ public class Page {
 
 	public void setLastDiff(String lastDiff) {
 		this.lastDiff = lastDiff;
-	}
-
-	public String getPreviousCrawlContent() {
-		return previousCrawlContent;
-	}
-
-	public void setPreviousCrawlContent(String previousCrawlContent) {
-		this.previousCrawlContent = previousCrawlContent;
 	}
 
 	public String getCurrentContent() {

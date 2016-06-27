@@ -32,7 +32,7 @@ public class CrawlerAPIController {
 	//private BD2KCrawler crawler;	//singleton instance used to call crawl ops, probably belongs in service
 	
 	@Autowired
-	private PageService pageServce;
+	private PageService pageService;
 	
 	@Autowired
 	private CenterService centerService;
@@ -88,13 +88,13 @@ public class CrawlerAPIController {
 		//BD2KCrawler crawler = new BD2KCrawler();
 		String[] seedURLs = {url};
 		String[] excludedURLs = {};
-		crawler = new BD2KCrawler("", "https://bd2kccc.org", seedURLs,
+		crawler = new BD2KCrawler("TestCenter", "https://bd2kccc.org", seedURLs,
 				excludedURLs);
-		crawler.setDomain("https://bd2kccc.org");
+
 		crawler.setSeedURLs(seedURLs);
 		
 		try {
-			crawler.crawl();
+			System.out.println(BD2KCrawler.crawl());
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			System.out.println("error in crawl()");
@@ -106,8 +106,48 @@ public class CrawlerAPIController {
 	
 	@RequestMapping(value="/testCrawl/stop")
 	public String testStopCrawler() {
-		crawler.stopCrawling();	//may need crawler to be a static member
+		boolean stopped = crawler.stopCrawling();	//may need crawler to be a static member
 		
-		return "crawler gracefully stopped.";
+		return "crawler gracefully stopped: " + stopped;
+	}
+	
+	@RequestMapping(value="/testPages")
+	public Page testPages() {
+		
+		Page p = pageService.getPageByURLandCenterId("googles.com", null);
+		if(p == null)
+			System.out.println("doesnt exist...");
+		
+		return pageService.getPageByURLandCenterId("google.com", null);
+		//return pageService.getPageByID("57717eaa83e10e0750c58ca7");
+	}
+	
+	@RequestMapping(value="/testGetStatus")
+	public String testStatus() {
+		
+		if(crawler == null) {
+			return "[ OK ]: Crawler is idle";
+		}
+		
+		int status = crawler.getCrawlerStatus();
+		if(status == 1) {
+			return "[ ! ] Crawler is already running, please wait until it completes before initiating another crawl";
+		}
+		
+		return "[ OK ]: Crawler is idle.";
+		
+	}
+	
+	@RequestMapping(value="/getAllPages")
+	public List<Page> getAllPages() {
+		
+		return pageService.getAllPages();
+	}
+	
+	@RequestMapping(value="/getPages")
+	public List<Page> getAllPagesLimOff(@RequestParam("limit") int limit,
+			@RequestParam("offset") int offset) {
+		
+		return pageService.getAllPagesLimOff(limit, offset);
 	}
 }
