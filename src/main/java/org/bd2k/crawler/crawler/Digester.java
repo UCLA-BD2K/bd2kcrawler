@@ -54,7 +54,7 @@ public class Digester {
 	public String computeHTMLDiff() {
 		
 		LinkedList<Diff> diffs = digest.diff_main(this.stringOne, this.stringTwo);
-		//digest.diff_cleanupSemantic(diffs);
+		
 		return digest.diff_prettyHtml(diffs);
 		
 

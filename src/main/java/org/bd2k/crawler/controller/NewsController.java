@@ -6,8 +6,8 @@ import java.util.List;
 import javax.servlet.http.HttpServletResponse;
 
 import org.bd2k.crawler.crawler.BD2KCrawler;
-import org.bd2k.crawler.crawler.Digester;
 import org.bd2k.crawler.model.Center;
+import org.bd2k.crawler.model.Page;
 import org.bd2k.crawler.service.CenterService;
 import org.bd2k.crawler.service.PageService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,6 +15,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
@@ -26,7 +27,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class NewsController {
 	
 	@Autowired
-	private PageService pageServce;
+	private PageService pageService;
 	
 	@Autowired
 	private CenterService centerService;
@@ -34,42 +35,73 @@ public class NewsController {
 	//class crawler and digester
 	private static BD2KCrawler crawler;
 	
-	/**
-	 * domain that the crawler will crawl
-	 */
-	@Value("${crawler.domain}")
-	String domain;
-	
+	private final int CRAWLER_RUNNING = 1;
+	private final int CRAWLER_IDLE = 0;
+		
 	/*
 	 * Checks all websites and checks if there are any changes since the last check. 
 	 * If the process is already running, it should return the status.*/
 	@RequestMapping(value="/news/update", method=RequestMethod.GET)
-	public void getNewCrawlData(HttpServletResponse res) {
+	public String getNewCrawlData(HttpServletResponse res) {
 		
-		System.out.println("running crawler...");
+		System.out.println("running crawler on all sites...");
 		
-		//redirects to result
-		try {
-			//
-			res.sendRedirect("/BD2KCrawler/test");
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+		List<Center> centers = centerService.getAllCenters();
+		String[] seeds = new String[centers.size()];
+		String[] excludes = {};
+		
+		for(int i = 0; i < seeds.length; i++) {
+			seeds[i] = centers.get(i).getSiteURL();
 		}
+		
+		//if no crawler instance
+		if(crawler == null) {
+			crawler = new BD2KCrawler();
+		}
+		
+		if(crawler.getCrawlerStatus() == CRAWLER_IDLE) {
+			
+			//if crawler is idle, then iteratively crawl all centers
+			for(int i = 0; i < seeds.length; i++) {
+				
+				String[] currSeed = {seeds[i]};			//for each site
+				
+				//current crawler info
+				crawler = new BD2KCrawler(
+						centers.get(i).getCenterID(), 
+						seeds[i], 
+						currSeed, 
+						excludes);
+				
+				try {
+					System.out.println("going to crawl: " + crawler.getCenterID());
+					BD2KCrawler.crawl();	//blocks here until crawl complete
+				}
+				catch(Exception e) {
+					e.printStackTrace();
+				}
+			}
+			
+		}
+		else {
+			return "[ ! ]: Crawler already running, please try again later.";
+		}
+		
+		return "[ OK ]: Crawl complete.";
 	}
 	
 	/*
 	 * Only checks the website associated with {id}.
 	 */
 	@RequestMapping(value="/news/update/{id}", method=RequestMethod.GET) 
-	public void getNewCrawlDataForId(HttpServletResponse res, 
+	public String getNewCrawlDataForId(HttpServletResponse res, 
 			@PathVariable("id") String id) {
 		
 		System.out.println("running crawler for centerID: " + id);
 		
 		List<Center> centers = centerService.getAllCenters();
 		String seedURL = null;
-		for(Center c: centers) {
+		for(Center c : centers) {
 			System.out.println(c.getCenterID());
 			if(c.getCenterID().equals(id)) {
 				seedURL = c.getSiteURL();
@@ -85,11 +117,16 @@ public class NewsController {
 			//ideally if it is not null, we want to return to the user to let them 
 			//know that a crawl is already taking place
 			if(crawler == null) {
-				crawler = new BD2KCrawler(id, domain, seeds, excludes);
+				crawler = new BD2KCrawler(id, seedURL, seeds, excludes);
+				
+				//Crawler is running!!!
+				if(crawler.getCrawlerStatus() == CRAWLER_RUNNING) {
+					return "[ ! ]: Crawler is already running, please try again later.";
+				}
 				
 				//attempt to crawl
 				try {
-					crawler.crawl();
+					BD2KCrawler.crawl();
 				} catch (Exception e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
@@ -104,50 +141,62 @@ public class NewsController {
 		}
 		
 		
-		//redirect to result page
-		try {
-			res.sendRedirect("/BD2KCrawler/test");
-		}
-		catch(Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+		return "[ OK ]: Crawl complete.";
 	}
 	
 	/*
 	 * Allows the viewers to see what the diffs are from all websites.
 	 */
 	@RequestMapping(value="/news/changes", method=RequestMethod.GET) 
-	public void getNewChanges(HttpServletResponse res) {
-		System.out.println("grabbing diffs for all websites.");
+	public List<Page> getNewChanges(HttpServletResponse res,
+			@RequestParam(value="limit", required=false) Integer limit,
+			@RequestParam(value="offset", required=false) Integer offset) {
 		
-		//redirect to result page
-		try {
-			res.sendRedirect("/BD2KCrawler/test");
+		if(limit != null && offset != null) {
+			return pageService.getAllPagesLimOff(limit, offset);
 		}
-		catch(Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+		
+		return pageService.getAllPages();
 	}
 	
 	/*
 	 * Allows the viewers to see what the diffs are from the website associated with [id].
 	 */
 	@RequestMapping(value="/news/changes/{id}", method=RequestMethod.GET) 
-	public void getNewChanges(HttpServletResponse res, 
-			@PathVariable("id") String id) {
-		System.out.println("grabbing diff for just: " + id);
+	public List<Page> getNewChanges(HttpServletResponse res, 
+			@PathVariable("id") String id,
+			@RequestParam(value="limit", required=false) Integer limit,
+			@RequestParam(value="offset", required=false) Integer offset) {
+			
+		if(limit != null && offset != null) {
+			return pageService.getPagesByCenterIDLimOff(limit, offset, id);
+		}
 		
-		//redirect to result page
-		try {
-			res.sendRedirect("/BD2KCrawler/test");
-		}
-		catch(Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+		return pageService.getPagesByCenterID(id);
 	}
 	
-
+	/*
+	 * Allows viewers to see the status of the crawler
+	 */
+	@RequestMapping(value="/news/crawlerStatus")
+	public String getCrawlerStatus() {
+		
+		int status = new BD2KCrawler().getCrawlerStatus();
+		
+		if(status == CRAWLER_RUNNING) {
+			return "Crawler is currently running...";
+		}
+		
+		return "Crawler is idle.";
+		
+	}
+	
+	/*
+	 * Allows moderators to request that the crawler be stopped.
+	 */
+	@RequestMapping(value="/news/crawlerStop")
+	public String stopCrawler() {
+		
+		return "Crawler stopped: " + BD2KCrawler.stopCrawling();
+	}
 }

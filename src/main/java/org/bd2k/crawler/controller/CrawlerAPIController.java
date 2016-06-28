@@ -104,21 +104,22 @@ public class CrawlerAPIController {
 		return "everything went OK";
 	}
 	
-	@RequestMapping(value="/testCrawl/stop")
+	@RequestMapping(value="/crawlStop")
 	public String testStopCrawler() {
 		boolean stopped = crawler.stopCrawling();	//may need crawler to be a static member
 		
-		return "crawler gracefully stopped: " + stopped;
+		return "Crawler gracefully stopped: " + stopped;
 	}
 	
 	@RequestMapping(value="/testPages")
-	public Page testPages() {
+	public List<Page> testPages() {
 		
 		Page p = pageService.getPageByURLandCenterId("googles.com", null);
 		if(p == null)
 			System.out.println("doesnt exist...");
 		
-		return pageService.getPageByURLandCenterId("google.com", null);
+		return pageService.getAllPages();
+		//return pageService.getPageByURLandCenterId("google.com", null);
 		//return pageService.getPageByID("57717eaa83e10e0750c58ca7");
 	}
 	
@@ -138,16 +139,22 @@ public class CrawlerAPIController {
 		
 	}
 	
-	@RequestMapping(value="/getAllPages")
+	@RequestMapping(value="/news/getAllPages")
 	public List<Page> getAllPages() {
 		
 		return pageService.getAllPages();
 	}
 	
-	@RequestMapping(value="/getPages")
+	@RequestMapping(value="/news/getPages")
 	public List<Page> getAllPagesLimOff(@RequestParam("limit") int limit,
 			@RequestParam("offset") int offset) {
-		
+		System.out.println( limit + " " + offset);
 		return pageService.getAllPagesLimOff(limit, offset);
+	}
+	
+	@RequestMapping(value="/news/getPagesForCenter")
+	public List<Page> getPagesForCenter(@RequestParam("center") String id) {
+		
+		return pageService.getPagesByCenterIDLimOff(10,10 ,id);
 	}
 }

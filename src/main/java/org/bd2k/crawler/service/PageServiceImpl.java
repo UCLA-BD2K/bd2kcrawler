@@ -5,6 +5,7 @@ import java.util.List;
 import org.bd2k.crawler.model.Page;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.MongoOperations;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
@@ -37,7 +38,8 @@ public class PageServiceImpl implements PageService {
 		// Retrieve from Database all archived pages for a given center id
 		Query q = new Query(Criteria.where("centerID").is(id));
 		List<Page> pages = mongoOperation.find(q, Page.class);
-	
+		q.with(new Sort(Sort.Direction.DESC, "lastCrawlTime"));
+		
 		return pages;
 	}
 
@@ -53,12 +55,12 @@ public class PageServiceImpl implements PageService {
 	public List<Page> getAllPagesLimOff(int limit, int offset) {
 		
 		// Retrieve all pages with the given limit and offset
-		Query q = new Query(Criteria.where("_id").exists(true));
-		q.limit(limit);
+		Query q = new Query(Criteria.where("id").exists(true));
 		q.skip(offset);
-		System.out.println("before query");
+		q.limit(limit);
+		q.with(new Sort(Sort.Direction.DESC, "lastCrawlTime"));
 		List<Page> pages = mongoOperation.find(q, Page.class);
-		System.out.println("woohoo");
+		
 		return pages;
 	}
 
@@ -69,7 +71,7 @@ public class PageServiceImpl implements PageService {
 		Query q = new Query(Criteria.where("centerID").is(id));
 		q.limit(limit);
 		q.skip(offset);
-		
+		q.with(new Sort(Sort.Direction.DESC, "lastCrawlTime"));
 		List<Page> pages = mongoOperation.find(q, Page.class);
 		
 		return pages;

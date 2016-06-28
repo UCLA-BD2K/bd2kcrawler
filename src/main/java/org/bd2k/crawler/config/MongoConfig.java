@@ -17,9 +17,12 @@ public class MongoConfig extends AbstractMongoConfiguration {
 	@Value("${db.host}")
 	String dbHost;
 	
+	@Value("${db.dbname}")
+	String dbname;
+	
 	@Override
 	public String getDatabaseName() {
-		return "BD2KCrawlerDB";
+		return dbname;
 	}
 	
 	@Override
