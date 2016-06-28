@@ -10,6 +10,7 @@
 <title>Dashboard | BD2KCrawler</title>
 
 <link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" rel="stylesheet" type="text/css" />
+<link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.6.3/css/font-awesome.min.css" rel="stylesheet" type="text/css" />
 <link href="resources/css/site.css" rel="stylesheet" type="text/css" />
 
 </head>
@@ -36,6 +37,7 @@
           <div class="row">
           	<div id="search-form" class="col-sm-12">
           		<div class="">
+          			<h3>Crawler status: <span id="crawler-status"></span><i class="fa fa-spinner fa-spin"></i></i></h3>
           			<h4>Filter results below:</h4>
           			<form action="" method="GET" id="dashboard-form">
           				<div class="form-group">
@@ -77,7 +79,7 @@
 			</div>
 			<div class="row">	
           			<div class="col-sm-12">
-          				Results:
+          				Results (Showing max 20):
           				<div id="search-results">
           					
           				</div>
@@ -91,7 +93,6 @@
 
 <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.2.4/jquery.min.js"></script>
 <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
-
 <script>
 
 	//probably want to use some templating JS library like backbone
@@ -116,7 +117,8 @@
 			e.preventDefault();
 			console.log("form submitted")
 			$.ajax({
-				url: "/BD2KCrawler/getPages?limit=" + 20 + "&offset=0" ,
+				url: "/BD2KCrawler/news/getPages?limit=" + 20 + "&offset=0" ,
+				//url:"/BD2KCrawler/getAllPages",
 				success:function(data) {
 					console.log(data);
 					generateListHTML(data);
@@ -127,6 +129,21 @@
 				}
 			})
 		});
+		
+		//periodically poll for crawler status, every 5 seconds
+		var id = setInterval(function() {
+			$('.fa-spinner').fadeIn();
+			$.ajax({
+				url:"/BD2KCrawler/news/crawlerStatus",
+				success:function(res) {
+					$('.fa-spinner').fadeOut();
+					$('#crawler-status').html(res);
+				},
+				error:function() {
+					console.log("error in getting crawler status");
+				}
+			});
+		}, 5000);
 	});
 	
 	

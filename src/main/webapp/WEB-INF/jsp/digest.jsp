@@ -45,6 +45,13 @@
           			<br/>
           			<div>--------------------------------------------------------------</div>
           			<br/>
+          			<div>
+          				<button id="show-content-btn">Toggle content</button>
+          				<div id="content" class="invisible" style="display:none">
+          					<br/>
+          					${ page.getCurrentContent() } 
+          				</div>
+          			</div><br/>
           			<div>Results:</div> <br />
           			<div>${ page.getLastDiff() }</div>
           		</div>
@@ -54,4 +61,21 @@
 </body>
 <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.2.4/jquery.min.js"></script>
 <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
+
+<script>
+	$(function() {
+		$('#show-content-btn').on('click', function(e) {
+			//e.preventDefault();
+			if($('#content').hasClass('invisible')) {
+				$('#content').fadeIn().removeClass('invisible').addClass('visible');
+			}
+			else {
+				$('#content').fadeOut().removeClass('visible').addClass('invisible');
+			}
+			
+		});
+	});
+
+</script>
+
 </html>
