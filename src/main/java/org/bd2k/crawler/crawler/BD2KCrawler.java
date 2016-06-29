@@ -3,7 +3,10 @@ package org.bd2k.crawler.crawler;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.regex.Pattern;
 
@@ -65,6 +68,9 @@ public class BD2KCrawler extends WebCrawler {
     //for use on sites that hold content in javascript, rather than html (LINCS-DCIC)
     //represents JS files that were already visited
     private static Set<String> visitedJS = new HashSet<String>();
+    
+    //for aggregating results for the current run, returned by crawl()
+    private static Map<String, String> changes = new HashMap<String, String>();
     
     //for generating timestamps
     private DateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ");
@@ -131,40 +137,37 @@ public class BD2KCrawler extends WebCrawler {
              System.out.println("Crawling centerid: " + getCenterID());
              System.out.println("results of crawl:");
              System.out.println(cleanText(text));
-             System.out.println("doc id " + page.getWebURL().getDocid() );
-             System.out.println(df.format(new Date()));
              
-             //aggregate all needed information for DB storage
-             boolean existChanges = false;					
+             // aggregate all needed information for DB storage					
              String lastCrawlTime = df.format(new Date());
              String lastDiff = "";
              String currentContent = cleanText(text);
 
              org.bd2k.crawler.model.Page p = pageService.getPageByURLandCenterId(url, BD2KCrawler.centerID);         
             
-             //if there is already an entry in the DB for this url+center combo,
-             //need to compute a new diff (here, HTML string representation)
+             // if there is already an entry in the DB for this url+center combo,
+             // need to compute a new diff (here, HTML string representation)
              if(p != null) {
             	 
-            	 //check if there is no change, skip generating diff
+            	 // check if there is no change, skip generating diff
             	 if(!currentContent.equals(p.getCurrentContent())) {
             		 Digester d = new Digester(p.getCurrentContent(), currentContent);
                 	 lastDiff = d.computeHTMLDiff(); 
-                	 existChanges = true;
+                	 changes.put(url, p.getId());	// log the change
             	 }
             	 else {
-            		 System.out.println("skip digester");
+            		 
             		 lastDiff = p.getLastDiff();	//same diff as before
             	 }
             	 
-            	 //set the updates
+            	 // set the updates
             	 p.setLastCrawlTime(lastCrawlTime);
             	 p.setLastDiff(lastDiff);
             	 p.setCurrentContent(currentContent);
              }
              else {
             	 
-            	 //else create a new document to add to DB
+            	 // else create a new document to add to DB
             	 p = new org.bd2k.crawler.model.Page(
             			 lastCrawlTime, 
             			 lastDiff, 
@@ -173,60 +176,54 @@ public class BD2KCrawler extends WebCrawler {
             			 BD2KCrawler.centerID);
              }
              
-             //store/update entry depending on logic above
+             // store/update entry depending on logic above
              pageService.savePage(p);
-             
-             //log for email if necessary
-             if(existChanges) {
-            	//NEED STATIC list of changes, or something*****
-             }
-             
-             //if LINCS-DCIC (or other site with JS generated content)
+                          
+             // if LINCS-DCIC (or other site with JS generated content)
              if(this.getCenterID().equals(LINCS_ID)) {
             	 
-            	 //get DOM representation
+            	 // get DOM representation
             	 Document doc = Jsoup.parseBodyFragment(htmlParseData.getHtml());
             	 Elements scripts = doc.getElementsByTag("script");
             	 
-            	 //iterate through all scripts
+            	 // iterate through all scripts
             	 for(Element ele: scripts) {
             		 
             		 String src = ele.attr("src");
             		 
-            		 //if the JS file has not been seen before this run and is valid, store to db
+            		 // if the JS file has not been seen before this run and is valid, store to db
             		 if (src != null && !src.isEmpty() && src.startsWith("js/data")
             				 && !visitedJS.contains(src)) {
             			 
             			 visitedJS.add(src);
-            			 System.out.println(src);
             			 GetRequest req = Unirest.get(LINCS_URL + src);
             			 
-            			 //no need to parse into objects, we will store as is = string
+            			 // no need to parse into objects, we will store as is = string
             			 lastCrawlTime = df.format(new Date());
             			 p = pageService.getPageByURLandCenterId(LINCS_URL+src, this.getCenterID());
             			         			 
             			 try {
-            				 System.out.println(req.asString().getBody());
             				 
-            				 //reuse variables
+            				 // reuse variables
             				 currentContent = req.asString().getBody();
             				 
-            				 //if there is an existing entry in DB, check for new diff
+            				 // if there is an existing entry in DB, check for new diff
             				 if(p != null) {
             					 if(!currentContent.equals(p.getCurrentContent())) {
             						 Digester d = new Digester(p.getCurrentContent(), currentContent);
             						 lastDiff = d.computeHTMLDiff();
+            						 changes.put(LINCS_URL + src, p.getId());
             					 }
             					 else {
             						 lastDiff = p.getLastDiff();
             					 }
             					 
-            					 //update values
+            					 // update values
             					 p.setLastCrawlTime(lastCrawlTime);
             	            	 p.setLastDiff(lastDiff);
             	            	 p.setCurrentContent(currentContent);
             				 }
-            				 else {	//else add a new document
+            				 else {	// else add a new document
             					 lastDiff = "";	
             					 p = new org.bd2k.crawler.model.Page(
             							 lastCrawlTime,
@@ -236,7 +233,7 @@ public class BD2KCrawler extends WebCrawler {
             							 this.getCenterID());
             				 }
             				 
-            				 //save/update
+            				 // save/update
             				 pageService.savePage(p);
             				 
             			 }
@@ -251,8 +248,8 @@ public class BD2KCrawler extends WebCrawler {
             	 }
              }
              
-             //if boolean flag set, there was a change and email needs
-             //to be sent, or some equivalent
+             // if boolean flag set, there was a change and email needs
+             // to be sent, or some equivalent
          }
     }
     
@@ -292,58 +289,54 @@ public class BD2KCrawler extends WebCrawler {
 	
 	
 	/* Crawl handler, exposed as a public method */
-    public static String crawl() throws Exception {
+    public static Map<String, String> crawl() throws Exception {
     	
-    	//do a quick check to see if crawler is already running -- added safety, not required
+    	// do a quick check to see if crawler is already running -- added safety, not required
     	if(controller != null) {
-   
-    		return "Crawling already in progress...";
+  
+    		return null;	
     	}
     	
     	// Required for HTTPS sites; see http://stackoverflow.com/a/14884941
-    	//SSL handshake fix
+    	// SSL handshake fix
         System.setProperty("jsse.enableSNIExtension", "false");
     	
-    	//configuration for crawler
+    	// configuration for crawler
     	CrawlConfig config = new CrawlConfig();
     	config.setCrawlStorageFolder(CRAWLER_STORAGE);
     	config.setPolitenessDelay(1000);				//1 req per sec, be nice!
     	
-    	
-    	//controller for this crawler
+    	// controller for this crawler
     	PageFetcher pf = new PageFetcher(config);
     	RobotstxtConfig robotstxtConfig = new RobotstxtConfig();
     	RobotstxtServer robotstxtServer = new RobotstxtServer(robotstxtConfig, pf);
     	controller = new CrawlController(config, pf, robotstxtServer);
     	
-    	//add the seeds to indicate where crawler should start
+    	// add the seeds to indicate where crawler should start
     	for(int i = 0; i < seedURLs.length; i++) {
     		controller.addSeed(seedURLs[i]);
     	}
     	
-    	//start the crawler, blocks here until completion
+    	// start the crawler, blocks here until completion
     	controller.start(BD2KCrawler.class, NUM_CRAWLERS);
-    	
-    	//before shutting down, email the results to everyone (***add to resetCralwler)
-    	System.out.println("completed crawl, num JS:" + visitedJS.size());
-    	Emailer em = new Emailer();
-    	
-    	//only gets here when no more crawling threads working
+    	    	
+    	// only gets here when no more crawling threads working
     	System.out.println("[BD2KCrawler] Finished crawling!");
-    	resetCrawler();		//reset controller, officially marks crawling over
+    	Map<String, String> results = changes;
+    	resetCrawler();		// reset controller, officially marks crawling over
     	
-    	return "Crawl complete.";
+    	return results;	// returns the changes found by crawl, if any
     }
     
-    //allow outsiders to suggest that the crawler should stop.
-    //in the future, may add more logic that denies stopping.
+    // allow outsiders to suggest that the crawler should stop.
+    // in the future, may add more logic that denies stopping.
     public static boolean stopCrawling() {
     	
-    	//if there is no crawler, then "stopping" technically succeeds
+    	// if there is no crawler, then "stopping" technically succeeds
     	if(controller == null)
     		return true;
     	
-    	//can implement this in any way, for simplicity we will just stop
+    	// can implement this in any way, for simplicity we will just stop
     	controller.shutdown();
     	controller.waitUntilFinish();
     	

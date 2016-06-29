@@ -1,9 +1,16 @@
 package org.bd2k.crawler.controller;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
+import java.util.Map;
+import java.util.Properties;
 
 import org.bd2k.crawler.crawler.BD2KCrawler;
 import org.bd2k.crawler.crawler.Digester;
+import org.bd2k.crawler.crawler.Email;
 import org.bd2k.crawler.model.Center;
 import org.bd2k.crawler.model.Page;
 import org.bd2k.crawler.service.CenterService;
@@ -13,6 +20,9 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import org.springframework.context.support.AbstractApplicationContext;
+import org.springframework.core.io.ClassPathResource;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.support.PropertiesLoaderUtils;
 import org.springframework.data.mongodb.core.MongoOperations;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
@@ -72,9 +82,6 @@ public class CrawlerAPIController {
 		//move below to service
 		ApplicationContext ctx = new AnnotationConfigApplicationContext(org.bd2k.crawler.config.MongoConfig.class);
 		MongoOperations mongoOperation = (MongoOperations) ctx.getBean("mongoTemplate");
-		//System.out.println("inserting facebook");
-//		Page dummyPage = new Page("facebook.com");
-//		mongoOperation.save(dummyPage);
 
 		Query q = new Query(Criteria.where("url").is(url));
 		Page p = mongoOperation.findOne(q, Page.class);
@@ -88,13 +95,33 @@ public class CrawlerAPIController {
 		//BD2KCrawler crawler = new BD2KCrawler();
 		String[] seedURLs = {url};
 		String[] excludedURLs = {};
+		DateFormat df = new SimpleDateFormat("MM/dd/yyyy HH:mm:ss");
+		String crawlStartTime = df.format(new Date());
+		
 		crawler = new BD2KCrawler("TestCenter", "https://bd2kccc.org", seedURLs,
 				excludedURLs);
 
 		crawler.setSeedURLs(seedURLs);
 		
 		try {
-			System.out.println(BD2KCrawler.crawl());
+			
+			Map<String, String> results = BD2KCrawler.crawl();
+			List<String> recipients = new ArrayList<String>();
+			recipients.add("alm.gong@gmail.com");
+			
+			String subject = "[BD2K Crawler] Results for crawl";
+			String header = "Request /testCrawl?url=" + url + "\n";
+			header += "Crawl initiated on: " + crawlStartTime + "\n";
+			header += "\n--------Center: " + "TestCenter--------\n";
+			String body = header + formatCrawlResultsForEmail(results);
+			
+			String attachment = "";
+			
+			sendCrawlResultsEmail(
+					subject, body, attachment, recipients);
+			
+			//Email.send(properties, recipients, subject, body, attachment);
+			
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			System.out.println("error in crawl()");
@@ -103,14 +130,14 @@ public class CrawlerAPIController {
 		
 		return "everything went OK";
 	}
-	
+		
 	@RequestMapping(value="/crawlStop")
 	public String testStopCrawler() {
 		boolean stopped = crawler.stopCrawling();	//may need crawler to be a static member
 		
 		return "Crawler gracefully stopped: " + stopped;
 	}
-	
+		
 	@RequestMapping(value="/testPages")
 	public List<Page> testPages() {
 		
@@ -157,4 +184,39 @@ public class CrawlerAPIController {
 		
 		return pageService.getPagesByCenterIDLimOff(10,10 ,id);
 	}
+	
+	
+	/* Helpers */
+	public void sendCrawlResultsEmail(
+			String subject, String body, String attachment, 
+			List<String> recipients) {
+	
+		try {
+			Resource resource = new ClassPathResource("credentials.properties");
+			Properties properties = PropertiesLoaderUtils.loadProperties(resource);
+			
+			Email.send(properties, recipients, subject, body, attachment);
+		}
+		catch(Exception e) {
+			e.printStackTrace();
+		}
+		
+	}
+	
+	
+	public String formatCrawlResultsForEmail(Map<String, String> results) {
+		
+		String formattedString = "\n";
+		for(Map.Entry<String, String> entry : results.entrySet()) {
+			//formattedString += 
+			//		("<a href=\"http://127.0.0.1:8080/BD2KCrawler/digestResults?id=" + 
+			//				entry.getValue() + "\">" + entry.getKey() + "</a><br/>");
+			
+			formattedString += entry.getKey() + " --> " +
+								"http://127.0.0.1:8080/BD2KCrawler/digestResults?id=" + 
+								entry.getValue() + "\n\n";
+		}
+		
+		return formattedString;
+	}	
 }

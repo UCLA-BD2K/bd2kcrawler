@@ -1,17 +1,27 @@
 package org.bd2k.crawler.controller;
 
 import java.io.IOException;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
+import java.util.Map;
+import java.util.Properties;
 
 import javax.servlet.http.HttpServletResponse;
 
 import org.bd2k.crawler.crawler.BD2KCrawler;
+import org.bd2k.crawler.crawler.Email;
 import org.bd2k.crawler.model.Center;
 import org.bd2k.crawler.model.Page;
 import org.bd2k.crawler.service.CenterService;
 import org.bd2k.crawler.service.PageService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.io.ClassPathResource;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.support.PropertiesLoaderUtils;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -40,7 +50,8 @@ public class NewsController {
 		
 	/*
 	 * Checks all websites and checks if there are any changes since the last check. 
-	 * If the process is already running, it should return the status.*/
+	 * If the process is already running, it should return the status.
+	 */
 	@RequestMapping(value="/news/update", method=RequestMethod.GET)
 	public String getNewCrawlData(HttpServletResponse res) {
 		
@@ -49,6 +60,10 @@ public class NewsController {
 		List<Center> centers = centerService.getAllCenters();
 		String[] seeds = new String[centers.size()];
 		String[] excludes = {};
+		
+		Map<String, String> crawlerResults = null;
+		DateFormat df = new SimpleDateFormat("MM/dd/yyyy HH:mm:ss");
+		String crawlStartTime = df.format(new Date());
 		
 		for(int i = 0; i < seeds.length; i++) {
 			seeds[i] = centers.get(i).getSiteURL();
@@ -60,6 +75,16 @@ public class NewsController {
 		}
 		
 		if(crawler.getCrawlerStatus() == CRAWLER_IDLE) {
+			
+			// generate email contents
+			List<String> recipients = new ArrayList<String>();
+			recipients.add("alm.gong@gmail.com");	// temp, until we decide
+			String subject = "[BD2K Crawler] Results for crawl";
+			String header = "Request /news/update\n";
+			header += "Crawl initiated on: " + crawlStartTime + "\n";
+			
+			String body = header;	// start with the header
+			String attachment = "";
 			
 			//if crawler is idle, then iteratively crawl all centers
 			for(int i = 0; i < seeds.length; i++) {
@@ -75,13 +100,20 @@ public class NewsController {
 				
 				try {
 					System.out.println("going to crawl: " + crawler.getCenterID());
-					BD2KCrawler.crawl();	//blocks here until crawl complete
+					crawlerResults = BD2KCrawler.crawl();	//blocks here until crawl complete
+					
+					//add to the email body
+					body += "\n--------Center: " + crawler.getCenterID() + "--------\n";
+					body += formatCrawlResultsForEmail(crawlerResults); 
 				}
 				catch(Exception e) {
 					e.printStackTrace();
 				}
 			}
 			
+			// now actually send the huge email
+			sendCrawlResultsEmail(
+					subject, body, attachment, recipients);
 		}
 		else {
 			return "[ ! ]: Crawler already running, please try again later.";
@@ -113,6 +145,9 @@ public class NewsController {
 		if(seedURL!=null) {
 			String[] seeds = {seedURL};
 			String[] excludes = {};
+			Map<String, String> crawlerResults = null;
+			DateFormat df = new SimpleDateFormat("MM/dd/yyyy HH:mm:ss");
+			String crawlStartTime = df.format(new Date());
 			
 			//crawler can be null if no other crawls started
 			if(crawler == null) {
@@ -125,7 +160,7 @@ public class NewsController {
 				
 				//attempt to crawl
 				try {
-					BD2KCrawler.crawl();
+					crawlerResults = BD2KCrawler.crawl();
 				} catch (Exception e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
@@ -138,12 +173,28 @@ public class NewsController {
 				//crawler exists and is idle, so just run it
 				crawler = new BD2KCrawler(id, seedURL, seeds, excludes);
 				try {
-					BD2KCrawler.crawl();
+					crawlerResults = BD2KCrawler.crawl();
 				}
 				catch(Exception e) {
 					e.printStackTrace();
 				}
 			}
+			
+			// generate email contents
+			List<String> recipients = new ArrayList<String>();
+			recipients.add("alm.gong@gmail.com");	//temp, until we decide
+			String subject = "[BD2K Crawler] Results for crawl";
+			String header = "Request /news/update/" + id + "\n";
+			header += "Crawl initiated on: " + crawlStartTime + "\n";
+			header += "\n--------Center: " + id + "--------\n";
+			String body;
+			String attachment = "";
+			
+			// generate remaining part of email body
+			body = header + formatCrawlResultsForEmail(crawlerResults);
+			
+			sendCrawlResultsEmail(
+					subject, body, attachment, recipients);
 		}
 		else {
 			System.out.println("No matching id");
@@ -208,4 +259,44 @@ public class NewsController {
 		
 		return "Crawler stopped: " + BD2KCrawler.stopCrawling();
 	}
+	
+	/* Private helpers */
+	private void sendCrawlResultsEmail(
+			String subject, String body, String attachment, 
+			List<String> recipients) {
+	
+		try {
+			Resource resource = new ClassPathResource("credentials.properties");
+			Properties properties = PropertiesLoaderUtils.loadProperties(resource);
+			
+			Email.send(properties, recipients, subject, body, attachment);
+		}
+		catch(Exception e) {
+			e.printStackTrace();
+		}
+		
+	}
+	
+	
+	private String formatCrawlResultsForEmail(Map<String, String> results) {
+		
+		
+		String formattedString = "\n";
+		
+		if(results.isEmpty()) {
+			return formattedString + "NO CHANGES\n\n";
+		}
+		
+		for(Map.Entry<String, String> entry : results.entrySet()) {
+			//formattedString += 
+			//		("<a href=\"http://127.0.0.1:8080/BD2KCrawler/digestResults?id=" + 
+			//				entry.getValue() + "\">" + entry.getKey() + "</a><br/>");
+			
+			formattedString += entry.getKey() + " --> " +
+								"http://127.0.0.1:8080/BD2KCrawler/digestResults?id=" + 
+								entry.getValue() + "\n\n";
+		}
+		
+		return formattedString;
+	}	
 }
