@@ -1,5 +1,8 @@
 package org.bd2k.crawler.controller;
 
+import java.security.Principal;
+import java.util.List;
+
 import javax.servlet.http.HttpServletRequest;
 
 import org.bd2k.crawler.model.Page;
@@ -38,29 +41,26 @@ public class CrawlerSiteController {
 	
 	/* homepage */
 	@RequestMapping(value="/index", method=RequestMethod.GET) 
-	public String getHomePage() {
+	public String getHomePage(Principal p) {
+		
+		if(p != null) {
+			System.out.println("principal name " + p.getName());
+			return "redirect:dashboard";
+		}
+		
 		return "index";
 	}
 	
 	/* dashboard */
 	@RequestMapping(value="/dashboard", method=RequestMethod.GET) 
-	public String getDashboardPage(Model model) {
-		//probably doesn't belong here, save for refactoring later
-//		HashMap<String, String> bd2kCenters = new HashMap<String, String>();
-//		bd2kCenters.put("BDDS", "https://bd2kccc.org/index.php/bdds");
-//		bd2kCenters.put("BDTG", "https://bd2kccc.org/index.php/bdtg");
-//		bd2kCenters.put("CCD", "https://bd2kccc.org/index.php/ccd");
-//		bd2kCenters.put("CEDAR", "https://bd2kccc.org/index.php/cedar");
-//		bd2kCenters.put("CPCP", "https://bd2kccc.org/index.php/cpcp");
-//		bd2kCenters.put("ENIGMA", "https://bd2kccc.org/index.php/enigma");
-//		bd2kCenters.put("HeartBD2K", "https://bd2kccc.org/index.php/heartbd2k");
-//		bd2kCenters.put("KnowEng", "https://bd2kccc.org/index.php/knoweng");
-//		bd2kCenters.put("LINCS-DCIC", "https://bd2kccc.org/index.php/lincs-dcic");
-//		bd2kCenters.put("LINCS-TG", "https://bd2kccc.org/index.php/lincs-tg");
-//		bd2kCenters.put("MD2K", "https://bd2kccc.org/index.php/md2k");
-//		bd2kCenters.put("Mobilize", "https://bd2kccc.org/index.php/mobilize");
-//		bd2kCenters.put("PIC-SURE", "https://bd2kccc.org/index.php/picsure");
+	public String getDashboardPage(Principal p, Model model,
+			@RequestParam(value="page", required=false) Integer pageNum,
+			@RequestParam(value="center", required=false) String center,
+			@RequestParam(value="type", required=false) String type) {
 		
+		//principal will always exist as this page requires ROLE_USER/ADMIN
+		
+		//may want to refactor and just ask DB for these
 		String[] bd2kCenters = {"BDDS", "BDTG", "CCD", "CEDAR", "CPCP", "ENIGMA",
 				"HeartBD2K", "KnowEng", "LINCS-DCIC", "LINCS-TG", "MD2K", "Mobilize",
 				"PIC-SURE"};
@@ -69,8 +69,45 @@ public class CrawlerSiteController {
 				"AI117924", "EB020403", "GM114833", "GM114838", "HL127624", 
 				"HL127366", "EB020404", "EB020405", "HG007963"};
 		
+		int resultsPerPage = 20;	//results to show per page
+		
+		//default to first page
+		if(pageNum == null) {
+			pageNum = 1;
+		}
+		
+		if(center == null) {
+			center = "all";
+		}
+		
+		if(type == null) {
+			type = "sites";
+		}
+		
+		//get default results, most recent 20
+		List<Page> results;
+		
+		//if all centers are desired
+		if(center.equals("all")) {
+			
+			results = pageService.getAllPagesLimOff(resultsPerPage, 
+					resultsPerPage*(pageNum-1));
+		}
+		else {	
+			
+			//only grab results for the given center
+			results = pageService.getPagesByCenterIDLimOff(resultsPerPage,
+					resultsPerPage*(pageNum-1), center);
+		}
+		
+		//set model attributes for view
 		model.addAttribute("bd2kCenters", bd2kCenters);
 		model.addAttribute("grantList", grantList);
+		model.addAttribute("pageNum", pageNum);
+		model.addAttribute("results", results);
+		model.addAttribute("chosenCenter", center);
+		model.addAttribute("type", type);
+		model.addAttribute("user", p.getName());
 		
 		return "dashboard";
 	}
@@ -84,19 +121,6 @@ public class CrawlerSiteController {
 		model.addAttribute("page", p);
 		
 		return "digest";
-	}
-	
-	// other
-	//should be in its own controller
-	@RequestMapping(value="/login", method=RequestMethod.POST) 
-	public String loginUser(HttpServletRequest req) {
-		System.out.println("loginUser()");
-		
-		if(authService.verifyUser(new User(req.getParameter("username"),
-				req.getParameter("password"))))
-			return "redirect:dashboard";
-			
-		return "redirect:index";	//fail auth
 	}
 }
 

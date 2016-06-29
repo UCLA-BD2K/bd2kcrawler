@@ -1,5 +1,8 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
     pageEncoding="UTF-8"%>
+    
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
+
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html>
 <head>
@@ -35,9 +38,9 @@
           		<div class="col-sm-6">
           			<div id="login-form">
           				<h4>Login:</h4>
-          				<form method="POST" action="login">
-          					<label for="username">Username:</label>
-          					<input class="form-control" name="username" type="text" id="username" />
+          				<form action="<c:url value="/login?${_csrf.parameterName}=${_csrf.token}"></c:url>" method="post" role="form">
+          					<label for="email">Email:</label>
+          					<input class="form-control" name="email" type="text" id="email" />
           					<label for="pass">Password:</label>
           					<input class="form-control" name="password" type="password" id="pass" />
           					<br />

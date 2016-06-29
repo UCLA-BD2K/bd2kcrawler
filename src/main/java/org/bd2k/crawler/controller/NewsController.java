@@ -114,8 +114,7 @@ public class NewsController {
 			String[] seeds = {seedURL};
 			String[] excludes = {};
 			
-			//ideally if it is not null, we want to return to the user to let them 
-			//know that a crawl is already taking place
+			//crawler can be null if no other crawls started
 			if(crawler == null) {
 				crawler = new BD2KCrawler(id, seedURL, seeds, excludes);
 				
@@ -132,8 +131,18 @@ public class NewsController {
 					e.printStackTrace();
 				}
 			}
+			else if(crawler.getCrawlerStatus() ==  CRAWLER_RUNNING) {
+				return "[ ! ]: Crawler is already running, please try again later.";
+			}
 			else {
-				System.out.println("Crawl already going on...");
+				//crawler exists and is idle, so just run it
+				crawler = new BD2KCrawler(id, seedURL, seeds, excludes);
+				try {
+					BD2KCrawler.crawl();
+				}
+				catch(Exception e) {
+					e.printStackTrace();
+				}
 			}
 		}
 		else {

@@ -15,8 +15,9 @@ public class User {
 	
 	private String firstName;
 	private String lastName;
-	private String password;
+	private String password;	//should be hashed
 	private String email;
+	private String role;
 		
 	// cstrs
 	public User() {}
@@ -24,11 +25,13 @@ public class User {
 		email = em;
 		password = pass;
 	}
-	public User(String fname, String lname, String pass, String emailAdd) {
+	public User(String fname, String lname, String pass, String emailAdd,
+			String r) {
 		firstName = fname;
 		lastName = lname;
 		password = pass;
 		email = emailAdd;
+		role = r;
 	}
 	
 	
@@ -63,6 +66,12 @@ public class User {
 	}
 	public void setEmail(String email) {
 		this.email = email;
+	}
+	public String getRole() {
+		return role;
+	}
+	public void setRole(String role) {
+		this.role = role;
 	}
 	
 	// for nice printing

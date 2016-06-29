@@ -135,6 +135,7 @@ public class BD2KCrawler extends WebCrawler {
              System.out.println(df.format(new Date()));
              
              //aggregate all needed information for DB storage
+             boolean existChanges = false;					
              String lastCrawlTime = df.format(new Date());
              String lastDiff = "";
              String currentContent = cleanText(text);
@@ -149,6 +150,7 @@ public class BD2KCrawler extends WebCrawler {
             	 if(!currentContent.equals(p.getCurrentContent())) {
             		 Digester d = new Digester(p.getCurrentContent(), currentContent);
                 	 lastDiff = d.computeHTMLDiff(); 
+                	 existChanges = true;
             	 }
             	 else {
             		 System.out.println("skip digester");
@@ -174,18 +176,22 @@ public class BD2KCrawler extends WebCrawler {
              //store/update entry depending on logic above
              pageService.savePage(p);
              
+             //log for email if necessary
+             if(existChanges) {
+            	//NEED STATIC list of changes, or something*****
+             }
+             
              //if LINCS-DCIC (or other site with JS generated content)
-             System.out.println("better be LINCS-DCIC: " + this.getCenterID());
              if(this.getCenterID().equals(LINCS_ID)) {
-            	 System.out.println("in JS section");
+            	 
             	 //get DOM representation
             	 Document doc = Jsoup.parseBodyFragment(htmlParseData.getHtml());
             	 Elements scripts = doc.getElementsByTag("script");
             	 
             	 //iterate through all scripts
             	 for(Element ele: scripts) {
+            		 
             		 String src = ele.attr("src");
-            		 System.out.println(src);
             		 
             		 //if the JS file has not been seen before this run and is valid, store to db
             		 if (src != null && !src.isEmpty() && src.startsWith("js/data")
@@ -241,9 +247,6 @@ public class BD2KCrawler extends WebCrawler {
             			 catch(Exception e) {
             				 e.printStackTrace();
             			 }
-            			 
-            			 //left off here TODO
-            			 //if a change, save to db like above
             		 }
             	 }
              }
@@ -320,6 +323,10 @@ public class BD2KCrawler extends WebCrawler {
     	
     	//start the crawler, blocks here until completion
     	controller.start(BD2KCrawler.class, NUM_CRAWLERS);
+    	
+    	//before shutting down, email the results to everyone (***add to resetCralwler)
+    	System.out.println("completed crawl, num JS:" + visitedJS.size());
+    	Emailer em = new Emailer();
     	
     	//only gets here when no more crawling threads working
     	System.out.println("[BD2KCrawler] Finished crawling!");
