@@ -49,10 +49,12 @@
           				<button id="show-content-btn">Toggle content</button>
           				<div id="content" class="invisible" style="display:none">
           					<br/>
-          					${ page.getCurrentContent() } 
+          					<%pageContext.setAttribute("linefeed", "\n"); %> 
+          					${ page.getCurrentContent().replace(linefeed, "<br />") }
+          					
           				</div>
           			</div><br/>
-          			<div>Results:</div> <br />
+          			<div><b>Results:</b></div> <br />
           			<div>${ page.getLastDiff() }</div>
           		</div>
           	</div>     		
