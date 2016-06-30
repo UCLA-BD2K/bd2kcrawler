@@ -7,12 +7,12 @@ xsi:schemaLocation="http://www.springframework.org/schema/beans
 		http://www.springframework.org/schema/security/spring-security.xsd">
     
     <security:http pattern="/resources/css/**" security="none"/>
+    <!--   <security:http pattern="/**" security="none"/> -->
 	
-	<security:http use-expressions="false">
+	 <security:http use-expressions="false">
 		<security:intercept-url pattern="/index*" access="IS_AUTHENTICATED_ANONYMOUSLY"/>
 		<security:intercept-url pattern="/news/**" access="ROLE_ADMIN" />
 		<security:intercept-url pattern="/pub/**" access="ROLE_ADMIN" />
-		<security:intercept-url pattern="/fake" access="ROLE_ADMIN" />
 		<security:intercept-url pattern="/**" access="ROLE_ADMIN, ROLE_USER" />
 		<security:logout
     		logout-success-url="/index"
@@ -27,8 +27,9 @@ xsi:schemaLocation="http://www.springframework.org/schema/beans
 	
 	<security:authentication-manager>
 		<security:authentication-provider user-service-ref="secUserDetailsService">
+			<security:password-encoder ref="encoder"></security:password-encoder>
 		</security:authentication-provider>
 	</security:authentication-manager>
-	
+	<bean id="encoder" class="org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder" />
 	<bean id="secUserDetailsService" class="org.bd2k.crawler.service.SecUserDetailsService"></bean>
 </beans>
