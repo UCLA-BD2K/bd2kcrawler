@@ -20,7 +20,7 @@ public class Digester {
 	private String stringTwo;
 	
 	// delegation
-	diff_match_patch digest = new diff_match_patch(null);
+	diff_match_patch digest = new diff_match_patch();
 	
 	// cstrs
 	public Digester() {
@@ -54,7 +54,7 @@ public class Digester {
 	public String computeHTMLDiff() {
 		
 		LinkedList<Diff> diffs = digest.diff_main(this.stringOne, this.stringTwo);
-		
+		digest.diff_cleanupSemantic(diffs);
 		return digest.diff_prettyHtml(diffs);
 		
 

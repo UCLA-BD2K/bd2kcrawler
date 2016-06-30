@@ -33,7 +33,8 @@ import edu.uci.ics.crawler4j.url.WebURL;
 
 /**
  * Customized implementation of crawler4j's WebCrawler.
- * Main entry point to start crawling.
+ * Main entry point to start crawling; intended for
+ * crawling the 13 BD2K center web sites.
  * 
  * For each site/file crawled, will update and/or store result 
  * including a diff of the previous result, if applicable.
@@ -247,9 +248,6 @@ public class BD2KCrawler extends WebCrawler {
             		 }
             	 }
              }
-             
-             // if boolean flag set, there was a change and email needs
-             // to be sent, or some equivalent
          }
     }
     
@@ -324,6 +322,7 @@ public class BD2KCrawler extends WebCrawler {
     	System.out.println("[BD2KCrawler] Finished crawling!");
     	Map<String, String> results = changes;
     	resetCrawler();		// reset controller, officially marks crawling over
+    	stopCrawling();		// to ensure crawler has stopped, in case of some redirect loop
     	
     	return results;	// returns the changes found by crawl, if any
     }

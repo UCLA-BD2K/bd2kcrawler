@@ -1,22 +1,26 @@
 package org.bd2k.crawler.model;
 
 import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.mapping.Document;
 
 /**
  * Entity representing a document in the Publications collection.
  * @author allengong
  *
  */
+@Document(collection="Publications")
 public class Publication {
 	
 	@Id
 	private String id;
 	
 	private String title;
-	private String date;
+	private String pmid;
+	private String pubDate;
 	private String[] authors;
 	private String journal;
 	private String[] centers;
+	private String lastCrawlTime;
 	
 	/* cstrs */
 	public Publication(){}
@@ -24,7 +28,7 @@ public class Publication {
 	public Publication(String title, String date, String[] authors, String journal, String[] centers) {
 		super();
 		this.title = title;
-		this.date = date;
+		this.pubDate = date;
 		this.authors = authors;
 		this.journal = journal;
 		this.centers = centers;
@@ -49,12 +53,20 @@ public class Publication {
 		this.title = title;
 	}
 
-	public String getDate() {
-		return date;
+	public String getPmid() {
+		return pmid;
 	}
 
-	public void setDate(String date) {
-		this.date = date;
+	public void setPmid(String pmid) {
+		this.pmid = pmid;
+	}
+
+	public String getPubDate() {
+		return pubDate;
+	}
+
+	public void setPubDate(String date) {
+		this.pubDate = date;
 	}
 
 	public String[] getAuthors() {
@@ -79,5 +91,13 @@ public class Publication {
 
 	public void setCenters(String[] centers) {
 		this.centers = centers;
+	}
+
+	public String getLastCrawlTime() {
+		return lastCrawlTime;
+	}
+
+	public void setLastCrawlTime(String lastCrawlTime) {
+		this.lastCrawlTime = lastCrawlTime;
 	}
 }

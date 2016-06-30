@@ -9,6 +9,7 @@ import java.util.Map;
 import java.util.Properties;
 
 import org.bd2k.crawler.crawler.BD2KCrawler;
+import org.bd2k.crawler.crawler.BD2KPubCrawler;
 import org.bd2k.crawler.crawler.Digester;
 import org.bd2k.crawler.crawler.Email;
 import org.bd2k.crawler.model.Center;
@@ -57,7 +58,7 @@ public class CrawlerAPIController {
 	@RequestMapping(value="/testValue")
 	public String getValue() {
 		
-		Digester dig = new Digester("hello worlds", "hello my world");
+		Digester dig = new Digester("hello worldsewoo", "hello my world, whoa somethign new");
 		//System.out.println(dig.computeSemanticDiff());
 		
 		//return val;
@@ -70,11 +71,6 @@ public class CrawlerAPIController {
 		return dig.computeHTMLDiff();
 	}
 	
-	@RequestMapping(value="/testInsert")
-	public Page insertIntoDB(@RequestParam("url")String url) {
-		//repo.save(new Page(url));
-		return new Page();
-	}
 	
 	@RequestMapping(value="/testGet")
 	public Page getPageFromDB(@RequestParam("url") String url) {
@@ -166,25 +162,22 @@ public class CrawlerAPIController {
 		
 	}
 	
-	@RequestMapping(value="/news/getAllPages")
-	public List<Page> getAllPages() {
+	@RequestMapping(value="testPub")
+	public String testPub() {
 		
-		return pageService.getAllPages();
-	}
-	
-	@RequestMapping(value="/news/getPages")
-	public List<Page> getAllPagesLimOff(@RequestParam("limit") int limit,
-			@RequestParam("offset") int offset) {
-		System.out.println( limit + " " + offset);
-		return pageService.getAllPagesLimOff(limit, offset);
-	}
-	
-	@RequestMapping(value="/news/getPagesForCenter")
-	public List<Page> getPagesForCenter(@RequestParam("center") String id) {
+		String[] centers = {"MD2K"};
+		BD2KPubCrawler.setCentersToCrawl(centers);
 		
-		return pageService.getPagesByCenterIDLimOff(10,10 ,id);
+		try {
+			BD2KPubCrawler.crawl();
+		}
+		catch(Exception e) {
+			e.printStackTrace();
+		}
+		
+		return "done";
 	}
-	
+		
 	
 	/* Helpers */
 	public void sendCrawlResultsEmail(

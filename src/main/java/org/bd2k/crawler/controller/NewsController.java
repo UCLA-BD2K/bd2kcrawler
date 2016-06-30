@@ -260,6 +260,34 @@ public class NewsController {
 		return "Crawler stopped: " + BD2KCrawler.stopCrawling();
 	}
 	
+	/*
+	 * Retrieves ALL pages - this is a dangerous function.
+	 */
+	@RequestMapping(value="/news/getAllPages")
+	public List<Page> getAllPages() {
+		
+		return pageService.getAllPages();
+	}
+	
+	/*
+	 * Retrieve all pages with a specified limit and offset.
+	 */
+	@RequestMapping(value="/news/getPages")
+	public List<Page> getAllPagesLimOff(@RequestParam("limit") int limit,
+			@RequestParam("offset") int offset) {
+		
+		return pageService.getAllPagesLimOff(limit, offset);
+	}
+	
+	/*
+	 * Retrieve pages for a given center and limit + offset
+	 */
+	@RequestMapping(value="/news/getPagesForCenter")
+	public List<Page> getPagesForCenter(@RequestParam("center") String id) {
+		
+		return pageService.getPagesByCenterIDLimOff(10,10 ,id);
+	}
+	
 	/* Private helpers */
 	private void sendCrawlResultsEmail(
 			String subject, String body, String attachment, 
@@ -279,8 +307,7 @@ public class NewsController {
 	
 	
 	private String formatCrawlResultsForEmail(Map<String, String> results) {
-		
-		
+			
 		String formattedString = "\n";
 		
 		if(results.isEmpty()) {
@@ -288,10 +315,7 @@ public class NewsController {
 		}
 		
 		for(Map.Entry<String, String> entry : results.entrySet()) {
-			//formattedString += 
-			//		("<a href=\"http://127.0.0.1:8080/BD2KCrawler/digestResults?id=" + 
-			//				entry.getValue() + "\">" + entry.getKey() + "</a><br/>");
-			
+		
 			formattedString += entry.getKey() + " --> " +
 								"http://127.0.0.1:8080/BD2KCrawler/digestResults?id=" + 
 								entry.getValue() + "\n\n";

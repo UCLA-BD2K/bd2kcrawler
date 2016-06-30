@@ -3,11 +3,7 @@ package org.bd2k.crawler.controller;
 import java.security.Principal;
 import java.util.List;
 
-import javax.servlet.http.HttpServletRequest;
-
 import org.bd2k.crawler.model.Page;
-import org.bd2k.crawler.model.User;
-import org.bd2k.crawler.service.AuthService;
 import org.bd2k.crawler.service.PageService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -26,9 +22,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 public class CrawlerSiteController {
 	@Autowired
 	private PageService pageService;
-	
-	@Autowired
-	private AuthService authService;
+
 
 	/* for testing functionality */
 	@RequestMapping(value="/test", method=RequestMethod.GET)
