@@ -1,6 +1,7 @@
 package org.bd2k.crawler.service;
 
 import org.bd2k.crawler.model.Publication;
+import org.bd2k.crawler.model.PublicationResult;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import org.springframework.data.mongodb.core.MongoOperations;
@@ -48,7 +49,7 @@ public class PublicationServiceImpl implements PublicationService {
 		if(check != null) {
 			
 			check.setAuthors(p.getAuthors());
-			check.setCenters(p.getCenters());
+			//check.setCenters(p.getCenters());
 			check.setJournal(p.getJournal());
 			check.setTitle(p.getTitle());
 			check.setPubDate(p.getPubDate());
@@ -64,5 +65,43 @@ public class PublicationServiceImpl implements PublicationService {
 		}
 		
 	}
+	
+	@Override
+	public PublicationResult getPublicationResultByCenterID(String id) {
+		
+		Query q = new Query(Criteria.where("centerID").is(id));
+		PublicationResult res = mongoOperation.findOne(q, PublicationResult.class);
+		
+		return res;
+	}
 
+	@Override
+	public void savePublicationResult(PublicationResult p) {
+		
+		mongoOperation.save(p);	
+	}
+	
+	@Override
+	public void saveOrUpdatePublicationResult(PublicationResult p) {
+
+		Query q = new Query(Criteria.where("centerID").is(p.getCenterID()));
+		PublicationResult check = mongoOperation.findOne(q, PublicationResult.class);
+		
+		// if a document exists, update
+		if(check != null) {
+			check.setCenterID(p.getCenterID());
+			check.setCurrentContent(p.getCurrentContent());
+			check.setFullContent(p.getFullContent());
+			check.setLastCrawlTime(p.getLastCrawlTime());
+			check.setLastDiff(p.getLastDiff());
+			
+			mongoOperation.save(check);
+		}
+		
+		// else insert new document
+		else {
+			
+			mongoOperation.save(p);
+		}
+	}
 }

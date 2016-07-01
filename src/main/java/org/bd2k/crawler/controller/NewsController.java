@@ -47,6 +47,7 @@ public class NewsController {
 	
 	private final int CRAWLER_RUNNING = 1;
 	private final int CRAWLER_IDLE = 0;
+	private final String host = "127.0.0.1:8080/BD2KCrawler";
 		
 	/*
 	 * Checks all websites and checks if there are any changes since the last check. 
@@ -317,7 +318,7 @@ public class NewsController {
 		for(Map.Entry<String, String> entry : results.entrySet()) {
 		
 			formattedString += entry.getKey() + " --> " +
-								"http://127.0.0.1:8080/BD2KCrawler/digestResults?id=" + 
+								"http://" + host + "/digestResults?id=" + 
 								entry.getValue() + "\n\n";
 		}
 		

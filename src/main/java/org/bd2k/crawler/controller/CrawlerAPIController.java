@@ -4,6 +4,7 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
@@ -162,20 +163,29 @@ public class CrawlerAPIController {
 		
 	}
 	
-	@RequestMapping(value="testPub")
+	@RequestMapping(value="/testPub")
 	public String testPub() {
 		
-		String[] centers = {"MD2K"};
+		String[] centers = {"LINCS-DCIC"};
 		BD2KPubCrawler.setCentersToCrawl(centers);
-		
+		Map<String, String> results = new HashMap<String,String>();
 		try {
-			BD2KPubCrawler.crawl();
+			 results = BD2KPubCrawler.crawl();
 		}
 		catch(Exception e) {
 			e.printStackTrace();
 		}
 		
-		return "done";
+		if(results == null) {
+			return "crawler running";
+		}
+		
+		String ret = "";
+		for(Map.Entry<String, String> entry : results.entrySet()) {
+			ret+=(entry.getKey() + " " + entry.getValue() + "\n");
+		}
+		
+		return ret;
 	}
 		
 	

@@ -1,9 +1,11 @@
 package org.bd2k.crawler.service;
 
 import org.bd2k.crawler.model.Publication;
+import org.bd2k.crawler.model.PublicationResult;
 
 /**
  * Interface for services that handle needs for archived publications.
+ * Also includes services for PublicationResult.
  * @author allengong
  *
  */
@@ -25,7 +27,7 @@ public interface PublicationService {
 	
 	/**
 	 * Stores the publication record into the database. No checks
-	 * will be made
+	 * will be made.
 	 * @param p the publication document
 	 */
 	public void savePublication(Publication p);
@@ -36,4 +38,25 @@ public interface PublicationService {
 	 * @param p the publication document
 	 */
 	public void saveOrUpdatePublication(Publication p);
+	
+	/**
+	 * Retrieves a PublicationResult by its center id.
+	 * @param id the center id
+	 * @return a PublicationResult object with matching center id, or null.
+	 */
+	public PublicationResult getPublicationResultByCenterID(String id);
+	
+	/**
+	 * Same as savePublication(), but for PublicationResult.
+	 * As before, no additional checks are made before saving, so
+	 * this is a less safe function than saveOrUpdateX().
+	 * @param p the publication result document
+	 */
+	public void savePublicationResult(PublicationResult p);
+	
+	/**
+	 * Same as saveOrUpdatePublication(), but for PublicationResult.
+	 * @param p the publication result document
+	 */
+	public void saveOrUpdatePublicationResult(PublicationResult p);
 }

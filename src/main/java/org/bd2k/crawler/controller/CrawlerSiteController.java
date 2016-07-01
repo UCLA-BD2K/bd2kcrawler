@@ -35,11 +35,21 @@ public class CrawlerSiteController {
 	
 	/* homepage */
 	@RequestMapping(value="/index", method=RequestMethod.GET) 
-	public String getHomePage(Principal p) {
+	public String getHomePage(Principal p, 
+			@RequestParam(value="error", required=false) String error,
+			@RequestParam(value="logout", required=false) String logout,
+			Model model) {
 		
 		if(p != null) {
 			System.out.println("principal name " + p.getName());
 			return "redirect:dashboard";
+		}
+		
+		if(error != null) {
+			model.addAttribute("error", true);
+		}
+		else if(logout != null) {
+			model.addAttribute("logout", true);
 		}
 		
 		return "index";
