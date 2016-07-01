@@ -38,6 +38,12 @@
           		<div class="col-sm-6">
           			<div id="login-form">
           				<h4>Login:</h4>
+          				<c:if test="${ error }">
+          					<div class="alert alert-danger">Invalid Credentials. Please try again.</div>
+          				</c:if>
+          				<c:if test="${ logout }">
+          					<div class="alert alert-success">Successfully logged out.</div>
+          				</c:if>
           				<form action="<c:url value="/login?${_csrf.parameterName}=${_csrf.token}"></c:url>" method="post" role="form">
           					<label for="email">Email:</label>
           					<input class="form-control" name="email" type="text" id="email" />

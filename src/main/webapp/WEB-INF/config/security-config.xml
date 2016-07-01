@@ -15,7 +15,7 @@ xsi:schemaLocation="http://www.springframework.org/schema/beans
 		<security:intercept-url pattern="/pub/**" access="ROLE_ADMIN" />
 		<security:intercept-url pattern="/**" access="ROLE_ADMIN, ROLE_USER" />
 		<security:logout
-    		logout-success-url="/index"
+    		logout-success-url="/index?logout=true"
    		 	logout-url="/logout"
   		/>
 		<security:form-login login-page="/index"

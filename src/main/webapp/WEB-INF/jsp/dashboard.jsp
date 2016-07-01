@@ -44,7 +44,8 @@
           <div class="row">
           	<div id="search-form" class="col-sm-12">
           		<div class="">
-          			<h3>Crawler status: <span id="crawler-status"></span><i class="fa fa-spinner fa-spin"></i></i></h3>
+          			<h3 id="site-crawler">Site Crawler status: <span id="crawler-status"></span><i class="fa fa-spinner fa-spin"></i></i></h3>
+          			<h3 id="pub-crawler">Publication Crawler status: <span id="crawler-status-pub"></span><i class="fa fa-spinner fa-spin"></i></i></h3>
           			<h4>Filter results below:</h4>
           			<div class="form-group">
           				<c:choose>
@@ -84,7 +85,7 @@
           						</c:forEach>
           					</select>
           				</div>
-          				<div class="form-group" style="display:none">
+          				<!--  <div class="form-group" style="display:none">
           					<label for="center-select">Grant:</label> 
           					<select name="grant" id="center-select">
           						<option value="any">Any</option>
@@ -92,7 +93,7 @@
           							<option value="${grant}">${grant}</option>
           						</c:forEach>
           					</select>
-          				</div>
+          				</div>-->
           				<div class="form-group">
           					<input type="submit" value="Search" />
           				</div>
@@ -123,14 +124,14 @@
  		 				<ul class="pagination">
  		 					<c:choose>
  		 					<c:when test="${pageNum-1 > 0}">
- 		 						<li class=""><a href="dashboard?center=${ chosenCenter }&page=${pageNum-1}" aria-label="Previous"><span aria-hidden="true">&laquo;</span></a></li>
+ 		 						<li class=""><a href="dashboard?type=${ type }&center=${ chosenCenter }&page=${pageNum-1}" aria-label="Previous"><span aria-hidden="true">&laquo;</span></a></li>
  		 					</c:when>
     						<c:otherwise>
     							<li class="disabled"><a href="#" aria-label="Previous"><span aria-hidden="true">&laquo;</span></a></li>
     						</c:otherwise>
     						</c:choose>
     						<li class="active"><a href="#">${pageNum} <span class="sr-only">(current)</span></a></li>
-    						<li><a href="dashboard?center=${ chosenCenter }&page=${pageNum+1}" aria-label="Next"><span aria-hidden="true">&raquo;</span></a></li>
+    						<li><a href="dashboard?type=${ type }&center=${ chosenCenter }&page=${pageNum+1}" aria-label="Next"><span aria-hidden="true">&raquo;</span></a></li>
   						</ul>
 					</nav>
           		</div>
@@ -160,37 +161,32 @@
 	}
 
 	$(function() {
-		
-		/*$('#dashboard-form').on("submit", function(e) {
-			e.preventDefault();
-			console.log("form submitted")
-			$.ajax({
-				url: "/BD2KCrawler/news/getPages?limit=" + 20 + "&offset=0" ,
-				//url:"/BD2KCrawler/getAllPages",
-				success:function(data) {
-					console.log(data);
-					generateListHTML(data);
-					$('#search-results').html(generateListHTML(data));
-				},
-				error:function() {
-					
-				}
-			})
-		});*/
-		
+				
 		//periodically poll for crawler status, every 7.5 seconds
 		var id = setInterval(function() {
 			$('.fa-spinner').fadeIn();
 			$.ajax({
 				url:"/BD2KCrawler/news/crawlerStatus",
 				success:function(res) {
-					$('.fa-spinner').fadeOut();
+					$('#site-crawler .fa-spinner').fadeOut();
 					$('#crawler-status').html(res);
 				},
 				error:function() {
 					console.log("error in getting crawler status");
 				}
 			});
+			
+			$.ajax({
+				url:"/BD2KCrawler/pub/crawlerStatus",
+				success:function(res) {
+					$('#pub-crawler .fa-spinner').fadeOut();
+					$('#crawler-status-pub').html(res);
+				},
+				error:function() {
+					console.log("error in getting pub crawler status");
+				}
+			})
+			
 		}, 7500);
 		
 		//clearInterval(id);	//temp for dev
