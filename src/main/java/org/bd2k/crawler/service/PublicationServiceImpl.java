@@ -54,7 +54,7 @@ public class PublicationServiceImpl implements PublicationService {
 			check.setTitle(p.getTitle());
 			check.setPubDate(p.getPubDate());
 			check.setPmid(p.getPmid());
-			check.setLastCrawlTime(p.getLastCrawlTime());
+			//check.setLastCrawlTime(p.getLastCrawlTime());
 			
 			mongoOperation.save(check);
 		}
