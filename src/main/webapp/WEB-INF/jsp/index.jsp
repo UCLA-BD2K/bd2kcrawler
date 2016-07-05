@@ -8,8 +8,9 @@
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <title>BD2KCrawler | Homepage</title>
-<link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" rel="stylesheet" type="text/css" />
-<link href="resources/css/site.css" rel="stylesheet" type="text/css" />
+
+<%@ include file="includes/css_includes.html" %>
+
 </head>
 <body>
 	<div class="container-fluid">
@@ -62,7 +63,6 @@
 	</div>
 </body>
 
-<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.2.4/jquery.min.js"></script>
-<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
+<%@ include file="includes/js_includes.html" %>
 
 </html>

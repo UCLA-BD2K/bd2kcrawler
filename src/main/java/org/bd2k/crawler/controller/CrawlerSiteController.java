@@ -118,11 +118,13 @@ public class CrawlerSiteController {
 	
 	/* results */
 	@RequestMapping(value="/digestResults")
-	public String getDigestResults(Model model, @RequestParam("id") String id) {
+	public String getDigestResults(Principal principal,
+			Model model, @RequestParam("id") String id) {
 		
 		//the id is the same as the value in _id
 		Page p = pageService.getPageByID(id);
 		model.addAttribute("page", p);
+		model.addAttribute("user", principal.getName());
 		
 		return "digest";
 	}
