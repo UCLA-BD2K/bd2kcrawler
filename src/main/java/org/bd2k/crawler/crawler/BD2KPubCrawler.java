@@ -189,7 +189,7 @@ public class BD2KPubCrawler {
 					pResult.setLastDiff(currentContent.toArray(new String[currentContent.size()]));
 				}
 				
-				//publicationService.savePublicationResult(pResult);
+				publicationService.savePublicationResult(pResult);
 				
 			}
 			else {	// else everything found was new
@@ -201,7 +201,7 @@ public class BD2KPubCrawler {
 				
 				changes.put(centersToCrawl[i], newPmids);
 				
-				//publicationService.savePublicationResult(pResult);
+				publicationService.savePublicationResult(pResult);
 			}
 			
 			

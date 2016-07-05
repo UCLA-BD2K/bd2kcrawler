@@ -1,14 +1,24 @@
 package org.bd2k.crawler.controller;
 
 import java.io.IOException;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.Properties;
 
 import javax.servlet.http.HttpServletResponse;
 
 import org.bd2k.crawler.crawler.BD2KPubCrawler;
+import org.bd2k.crawler.crawler.Email;
 import org.bd2k.crawler.service.PublicationService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.ClassPathResource;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.support.PropertiesLoaderUtils;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -28,6 +38,8 @@ public class PubController {
 	private final int CRAWLER_RUNNING = 1;
 	private final int CRAWLER_IDLE = 0;
 	
+	private DateFormat df;
+	
 	/*
 	 * Checks all publications and checks if there are any changes since the last check. 
 	 * If the process is already running, it should return the status.
@@ -36,6 +48,8 @@ public class PubController {
 	public String getNewPubData(HttpServletResponse res) {
 		
 		System.out.println("crawling all publications");
+		df = new SimpleDateFormat("MM/dd/yyyy HH:mm:ss");
+		String crawlStartTime = df.format(new Date());
 		
 		// sentinel object used for non-blocking check of status
 		BD2KPubCrawler crawler = new BD2KPubCrawler();
@@ -54,6 +68,20 @@ public class PubController {
 		catch(Exception e) {
 			e.printStackTrace();
 		}
+		
+		// send email with the changes
+		List<String> recipients = new ArrayList<String>();
+		recipients.add("alm.gong@gmail.com");	// temp, until we decide
+		String subject = "[BD2K PubCrawler] Results for crawl";
+		String header = "Request /pub/update\n";
+		header += "Crawl initiated on: " + crawlStartTime + "\n";
+		
+		String body = header;	// start with the header
+		String attachment = "";
+		body += "\n-------- RESULTS --------\n\n";
+		body += formatCrawlResultsForEmail(results);
+		
+		sendCrawlResultsEmail(subject, body.substring(0, body.length()-1), attachment, recipients);
 				
 		return formatCrawlResultsForEmail(results);	//temp for viewing
 	}
@@ -66,6 +94,8 @@ public class PubController {
 			@PathVariable("id") String id) {
 		
 		System.out.println("crawling publications with center: " + id);
+		df = new SimpleDateFormat("MM/dd/yyyy HH:mm:ss");
+		String crawlStartTime = df.format(new Date());
 		
 		String[] centers = {id};
 		BD2KPubCrawler.setCentersToCrawl(centers);
@@ -87,6 +117,20 @@ public class PubController {
 		catch(Exception e) {
 			e.printStackTrace();
 		}
+		
+		// send email with the changes
+		List<String> recipients = new ArrayList<String>();
+		recipients.add("alm.gong@gmail.com");	// temp, until we decide
+		String subject = "[BD2K PubCrawler] Results for crawl";
+		String header = "Request /pub/update/" + id + "\n";
+		header += "Crawl initiated on: " + crawlStartTime + "\n";
+		
+		String body = header;	// start with the header
+		String attachment = "";
+		body += "\n-------- RESULTS for: " + id + " --------\n\n";
+		body += formatCrawlResultsForEmail(results);
+		
+		sendCrawlResultsEmail(subject, body.substring(0, body.length()-1), attachment, recipients);
 				
 		return formatCrawlResultsForEmail(results);	//temp for viewing
 	}
@@ -142,6 +186,22 @@ public class PubController {
 	}
 	
 	/* private helpers */
+	private void sendCrawlResultsEmail(
+			String subject, String body, String attachment, 
+			List<String> recipients) {
+	
+		try {
+			Resource resource = new ClassPathResource("credentials.properties");
+			Properties properties = PropertiesLoaderUtils.loadProperties(resource);
+			
+			Email.send(properties, recipients, subject, body, attachment);
+		}
+		catch(Exception e) {
+			e.printStackTrace();
+		}
+		
+	}
+	
 	private String formatCrawlResultsForEmail(Map<String, String> results) {
 		
 		//formats specific to the pubmed crawl results.
@@ -152,7 +212,7 @@ public class PubController {
 		String ret = "";
 		for(Map.Entry<String, String> entry : results.entrySet()) {
 			ret += (
-					"(" + entry.getKey() + ")" + " " + entry.getValue() + "<br/>"
+					"(" + entry.getKey() + ")" + " " + entry.getValue() + "\n\n"
 					);
 		}
 		

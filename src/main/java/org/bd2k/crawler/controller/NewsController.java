@@ -100,7 +100,7 @@ public class NewsController {
 						excludes);
 				
 				try {
-					System.out.println("going to crawl: " + crawler.getCenterID());
+					
 					crawlerResults = BD2KCrawler.crawl();	//blocks here until crawl complete
 					
 					//add to the email body

@@ -16,6 +16,19 @@ public class PublicationServiceImpl implements PublicationService {
 	private static ApplicationContext ctx = new AnnotationConfigApplicationContext(org.bd2k.crawler.config.MongoConfig.class);
 	private static MongoOperations mongoOperation = (MongoOperations) ctx.getBean("mongoTemplate");
 		
+	// for dynamically setting config for an instance of CenterService, useful for testing
+	public void setMongoConfigContext(String cls) {
+		try {
+			Class className = Class.forName(cls);
+			ctx = new AnnotationConfigApplicationContext(className);
+			mongoOperation = (MongoOperations) ctx.getBean("mongoTemplate");
+		}
+		catch(ClassNotFoundException e) {
+			// if exception, do nothing
+			e.printStackTrace();
+		}
+	}
+	
 	@Override
 	public Publication getPublicationByID(String id) {
 		

@@ -18,7 +18,20 @@ public class PageServiceImpl implements PageService {
 	private static ApplicationContext ctx = new AnnotationConfigApplicationContext(org.bd2k.crawler.config.MongoConfig.class);
 	private static MongoOperations mongoOperation = (MongoOperations) ctx.getBean("mongoTemplate");
 	
-	//functionality test
+	// for dynamically setting config for an instance of CenterService, useful for testing
+	public void setMongoConfigContext(String cls) {
+		try {
+			Class className = Class.forName(cls);
+			ctx = new AnnotationConfigApplicationContext(className);
+			mongoOperation = (MongoOperations) ctx.getBean("mongoTemplate");
+		}
+		catch(ClassNotFoundException e) {
+			// if exception, do nothing
+			e.printStackTrace();
+		}
+	}
+	
+	// functionality test
 	public String ping() {
 		System.out.println((new Page()).ping());
 		return "[Archive Service Impl] I am alive";
@@ -26,7 +39,7 @@ public class PageServiceImpl implements PageService {
 	
 	public Page getPageByID(String id) {
 		
-		//Get requested page
+		// Get requested page
 		Query q = new Query(Criteria.where("id").is(id));
 		Page page = mongoOperation.findOne(q, Page.class);
 		
