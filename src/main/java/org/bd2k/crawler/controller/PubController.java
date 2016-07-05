@@ -14,6 +14,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.bd2k.crawler.crawler.BD2KPubCrawler;
 import org.bd2k.crawler.crawler.Email;
+import org.bd2k.crawler.model.PublicationResult;
 import org.bd2k.crawler.service.PublicationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ClassPathResource;
@@ -139,33 +140,22 @@ public class PubController {
 	 * Allows the viewers to see what the diffs are from all publications.
 	 */
 	@RequestMapping(value="/pub/changes", method=RequestMethod.GET)
-	public void getPubChanges(HttpServletResponse res) {
+	public List<PublicationResult> getPubChanges(HttpServletResponse res) {
 		
-		System.out.println("grabbing diffs for all pubs");
-		
-		try {
-			res.sendRedirect("/BD2KCrawler/test");
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+		return publicationService.getAllPublicationResults();
 	}
 	
 	/*
 	 * Allows the viewers to see what the diffs are from the publications associated with [id].
 	 */
 	@RequestMapping(value="/pub/changes/{id}", method=RequestMethod.GET)
-	public void getPubChangesForId(HttpServletResponse res,
+	public PublicationResult getPubChangesForId(HttpServletResponse res,
 			@PathVariable("id") String id) {
 		
-		System.out.println("grabbing diffs for just pub: " + id);
+		System.out.println("grabbing diffs for just center: " + id);
 		
-		try {
-			res.sendRedirect("/BD2KCrawler/test");
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+		return publicationService.getPublicationResultByCenterID(id);
+		
 	}
 	
 	/*

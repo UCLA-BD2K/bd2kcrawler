@@ -1,5 +1,7 @@
 package org.bd2k.crawler.service;
 
+import java.util.List;
+
 import org.bd2k.crawler.model.Publication;
 import org.bd2k.crawler.model.PublicationResult;
 
@@ -38,6 +40,12 @@ public interface PublicationService {
 	 * @param p the publication document
 	 */
 	public void saveOrUpdatePublication(Publication p);
+	
+	/**
+	 * Retrieves all Publication Results, indexed by CenterID.
+	 * @return a list of PublicationResult objects.
+	 */
+	public List<PublicationResult> getAllPublicationResults();
 	
 	/**
 	 * Retrieves a PublicationResult by its center id.

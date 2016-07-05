@@ -1,5 +1,7 @@
 package org.bd2k.crawler.service;
 
+import java.util.List;
+
 import org.bd2k.crawler.model.Publication;
 import org.bd2k.crawler.model.PublicationResult;
 import org.springframework.context.ApplicationContext;
@@ -77,6 +79,15 @@ public class PublicationServiceImpl implements PublicationService {
 			mongoOperation.save(p);
 		}
 		
+	}
+	
+	@Override
+	public List<PublicationResult> getAllPublicationResults() {
+		
+		Query q = new Query(Criteria.where("id").exists(true));
+		List<PublicationResult> results = mongoOperation.find(q, PublicationResult.class);
+		
+		return results;
 	}
 	
 	@Override
