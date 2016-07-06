@@ -54,12 +54,12 @@ public class CrawlerSiteController {
 			@RequestParam(value="logout", required=false) String logout,
 			Model model) {
 		
-		if(p != null) {
+		if (p != null) {
 			System.out.println("principal name " + p.getName());
 			return "redirect:dashboard";
 		}
 		
-		if(error != null) {
+		if (error != null) {
 			model.addAttribute("error", true);
 		} else if(logout != null) {
 			model.addAttribute("logout", true);
@@ -77,48 +77,48 @@ public class CrawlerSiteController {
 		return "dashboard";
 	}
 	
+	/* Site crawler main page */
 	@RequestMapping(value="/siteCrawler", method=RequestMethod.GET) 
 	public String getDashboardPage(Principal p, Model model,
 			@RequestParam(value="page", required=false) Integer pageNum,
 			@RequestParam(value="center", required=false) String center) {
 		
-		//principal will always exist as this page requires ROLE_USER/ADMIN
+		// principal will always exist as this page requires ROLE_USER/ADMIN
 		
-		//may want to refactor and just ask DB for these
+		// may want to refactor and just ask DB for these
 		String[] bd2kCenters = {"BDDS", "BDTG", "CCD", "CEDAR", "CPCP", "ENIGMA",
 				"HeartBD2K", "KnowEng", "LINCS-DCIC", "LINCS-TG", "MD2K", "Mobilize",
 				"PIC-SURE"};
 				
 		int resultsPerPage = 20;	//results to show per page
 		
-		//default to first page
-		if(pageNum == null) {
+		// default to first page
+		if (pageNum == null) {
 			pageNum = 1;
 		}
 		
-		if(center == null) {
+		if (center == null) {
 			center = "all";
 		}
 		
-		//get default results, most recent 20
+		// get default results, most recent 20
 		List<Page> results;
 		
-		//if all centers are desired
-		if(center.equals("all")) {
+		// if all centers are desired
+		if (center.equals("all")) {
 			
 			results = pageService.getAllPagesLimOff(resultsPerPage, 
 					resultsPerPage*(pageNum-1));
-		}
-		else {	
+		} else {	
 			
-			//only grab results for the given center
+			// only grab results for the given center
 			results = pageService.getPagesByCenterIDLimOff(resultsPerPage,
 					resultsPerPage*(pageNum-1), center);
 		}
 		
-		//set model attributes for view
+		// set model attributes for view
 		model.addAttribute("bd2kCenters", bd2kCenters);
-		//model.addAttribute("grantList", grantList);
+		// model.addAttribute("grantList", grantList);
 		model.addAttribute("pageNum", pageNum);
 		model.addAttribute("results", results);
 		model.addAttribute("chosenCenter", center);
@@ -127,6 +127,7 @@ public class CrawlerSiteController {
 		return "siteCrawler";
 	}
 	
+	/* Publication crawler main page */
 	@RequestMapping(value="/pubCrawler")
 	public String getPubCrawler(
 			Principal p, 
@@ -141,7 +142,7 @@ public class CrawlerSiteController {
 		List<Center> centers = centerService.getAllCenters();
 		String[] centerIDs = new String[centers.size()];
 		
-		for(int i = 0; i < centerIDs.length; i++) {
+		for (int i = 0; i < centerIDs.length; i++) {
 			centerIDs[i] = centers.get(i).getCenterID();
 		}
 		
@@ -174,21 +175,21 @@ public class CrawlerSiteController {
 			@RequestParam(value="pmid", required = false) String pmid,
 			@RequestParam(value="center", required= false) String center) {
 	
-		if(id != null) {
+		if (id != null) {
 			// the id is the same as the value in _id, and we want a Page
 			Page p = pageService.getPageByID(id);
 			model.addAttribute("page", p);
 			model.addAttribute("type", "page");
-		} else if(pmid != null && center != null){
+		} else if (pmid != null && center != null){
 			// we want a publication result
 			Publication pub = null;
 			PublicationResult pr = publicationService.getPublicationResultByCenterID(center);
 			
-			if(pr != null) {
+			if (pr != null) {
 				
 				// find the requested publication record
 				for(Publication p : pr.getFullContent()) {
-					if(p.getPmid().equals(pmid)) {
+					if (p.getPmid().equals(pmid)) {
 						pub = p;
 						break;
 					}

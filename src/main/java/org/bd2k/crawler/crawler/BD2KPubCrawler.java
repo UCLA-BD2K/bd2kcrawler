@@ -30,7 +30,7 @@ import com.mashape.unirest.http.Unirest;
  * 
  * Is a singleton class by simulating a static top level class (no instantiation).
  * For the most part, default values are what you want, but an init() family is
- * made avaialble for customization.
+ * made available for customization.
  * 
  * @author allengong
  *
@@ -56,7 +56,7 @@ public class BD2KPubCrawler {
 	public static Map<String, String> crawl() throws Exception {
 		
 		//safety check, to ensure only one crawl is every running at a time
-		if(running) {
+		if (running) {
 			return null;
 		}
 		
@@ -69,7 +69,7 @@ public class BD2KPubCrawler {
 		Map<String, String> centerGrantMap = getCenterGrantMap();
 				
 		//loop through all of the centers, crawl one by one
-		for(int i = 0; i < centersToCrawl.length; i++) {
+		for (int i = 0; i < centersToCrawl.length; i++) {
 			String searchUrl = "http://eutils.ncbi.nlm.nih.gov/entrez/eutils/esearch.fcgi?db=pubmed&term=" + 
 					centerGrantMap.get(centersToCrawl[i]) + "[Grant%20Number]&retmode=json&retmax=1000";
 			
@@ -79,7 +79,7 @@ public class BD2KPubCrawler {
 			JSONArray idList = json.getJSONObject("esearchresult").getJSONArray("idlist");
 						
 			// now we have all the publications for this center, query for a summary of pmids
-			if(idList.length() == 0) {
+			if (idList.length() == 0) {
 				
 				// move onto next center
 				continue;
@@ -89,7 +89,7 @@ public class BD2KPubCrawler {
 								idList.optInt(0);
 			
 			// add the remaining elements with a comma 
-			for(int j = 1; j < idList.length(); j++) {
+			for (int j = 1; j < idList.length(); j++) {
 				summaryURL += ("," + idList.optInt(j));
 			}
 			
@@ -105,7 +105,7 @@ public class BD2KPubCrawler {
 			
 			// iterate through all pmids for this center and check for differences
 			// (a new publication counts as a change)
-			for(int k = 0; k < idList.length(); k++) {
+			for (int k = 0; k < idList.length(); k++) {
 				
 				JSONObject pubJson = json.getJSONObject("" + idList.optInt(k));
 				
@@ -113,27 +113,30 @@ public class BD2KPubCrawler {
 				
 				// title
 				String unescapedPubTitle = pubJson.optString("title", "NO_TITLE");
-				unescapedPubTitle = org.apache.commons.lang3.StringEscapeUtils.unescapeHtml4(unescapedPubTitle);
+				unescapedPubTitle = 
+						org.apache.commons.lang3.StringEscapeUtils.unescapeHtml4(unescapedPubTitle);
+				
 				p.setTitle(unescapedPubTitle);
 				
 				// pmid and centers associated with this publication
 				p.setPmid(idList.optInt(k) + "");
-				//p.setCenters(publications.get(pmids[i]).toArray(new String[0]));
 				
 				// date
-				String pubDate = pubJson.optString("sortpubdate", "1066/01/01 00:00").substring(0, 10);
+				String pubDate = 
+						pubJson.optString("sortpubdate", "1066/01/01 00:00").substring(0, 10);
+				
 				pubDate = pubDate.replace("/", "-");
 				p.setPubDate(pubDate);
 				
 				// authors
 				JSONArray authorsJson = pubJson.getJSONArray("authors");
 				ArrayList<String> authorsList = new ArrayList<String>();
-				for(int m = 0; m < authorsJson.length(); m++) {
+				for (int m = 0; m < authorsJson.length(); m++) {
 					JSONObject jo = authorsJson.optJSONObject(m);
 					String type = (String)jo.optString("authtype");
 					
 					// if there is an author field, add 
-					if(jo.has("authtype") && type.equals("Author")) {
+					if (jo.has("authtype") && type.equals("Author")) {
 						authorsList.add((String)jo.optString("name"));
 					}
 				}
@@ -155,7 +158,7 @@ public class BD2KPubCrawler {
 			
 			// prepare content+full content
 			String[] pmids = new String[idList.length()];
-			for(int n = 0; n < idList.length(); n++) {
+			for (int n = 0; n < idList.length(); n++) {
 				pmids[n] = "" + idList.optInt(n);
 			}
 			pResult.setCurrentContent(pmids);
@@ -169,18 +172,21 @@ public class BD2KPubCrawler {
 					publicationService.getPublicationResultByCenterID(centersToCrawl[i]);
 			
 			// if there is a doc, need to check for diff + changes
-			if(check != null) {
+			if (check != null) {
 				
-				Set<String> previousContent = new HashSet<String>(Arrays.asList(check.getCurrentContent()));
+				Set<String> previousContent = 
+						new HashSet<String>(Arrays.asList(check.getCurrentContent()));
 				String[] copyOfPmids = Arrays.copyOf(pmids, pmids.length);
-				Set<String> currentContent = new HashSet<String>(Arrays.asList(copyOfPmids));	// use copy because removeAll() changes underlying array
+				
+				// use copy because removeAll() changes underlying array
+				Set<String> currentContent = new HashSet<String>(Arrays.asList(copyOfPmids));	
 				currentContent.removeAll(previousContent);	// emulate set difference
 				
 				// if there are changes found in this crawl, make a note + store
-				if(currentContent.size() > 0) {
+				if (currentContent.size() > 0) {
 					
 					String newPmids = "";					// comma separated representation
-					for(String s : currentContent) {
+					for (String s : currentContent) {
 						newPmids += (s + ", ");
 					}
 					changes.put(centersToCrawl[i], newPmids);
@@ -201,7 +207,7 @@ public class BD2KPubCrawler {
 			else {	// else everything found was new
 				
 				String newPmids = "";
-				for(int j = 0; j < pResult.getCurrentContent().length; j++) {
+				for (int j = 0; j < pResult.getCurrentContent().length; j++) {
 					newPmids += (pResult.getCurrentContent()[j] + ", ");
 				}
 				
@@ -228,7 +234,7 @@ public class BD2KPubCrawler {
 	private static Map<String, String> getCenterGrantMap() {
 		
 		Map<String, String> map = new HashMap<String, String>();
-		for(int i = 0; i < bd2kCenters.length; i++) {
+		for (int i = 0; i < bd2kCenters.length; i++) {
 			map.put(bd2kCenters[i], bd2kGrants[i]);
 		}
 		
@@ -263,7 +269,7 @@ public class BD2KPubCrawler {
 	// checks to see if a crawl is ongoing
 	public static int getCrawlerStatus() {
 		
-		if(running) {
+		if (running) {
 			return 1;
 		}
 		

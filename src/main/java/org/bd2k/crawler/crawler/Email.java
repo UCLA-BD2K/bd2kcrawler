@@ -22,7 +22,6 @@ import javax.mail.internet.MimeBodyPart;
 import javax.mail.internet.MimeMessage;
 import javax.mail.internet.MimeMultipart;
 
-
 /**
  * SendEmail
  * Created by vincekyi on 6/25/15. 
@@ -30,7 +29,8 @@ import javax.mail.internet.MimeMultipart;
  */
 public class Email {
 	
-	 public static boolean send(Properties properties, List<String> recipients, String subject, String body,
+	 public static boolean send(Properties properties, List<String> recipients, 
+			 String subject, String body,
              String attachment) throws IOException {
 		 // Get sender credentials
 		 final Credentials sender = new Credentials(properties);

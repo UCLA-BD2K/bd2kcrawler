@@ -19,7 +19,9 @@ import org.springframework.stereotype.Service;
 public class CenterServiceImpl implements CenterService {
 	
 	// may need refactoring
-	private ApplicationContext ctx = new AnnotationConfigApplicationContext(org.bd2k.crawler.config.MongoConfig.class);
+	private ApplicationContext ctx = 
+			new AnnotationConfigApplicationContext(org.bd2k.crawler.config.MongoConfig.class);
+	
 	private MongoOperations mongoOperation = (MongoOperations) ctx.getBean("mongoTemplate");
 
 	// for dynamically setting config for an instance of CenterService, useful for testing
@@ -29,28 +31,30 @@ public class CenterServiceImpl implements CenterService {
 			ctx = new AnnotationConfigApplicationContext(className);
 			mongoOperation = (MongoOperations) ctx.getBean("mongoTemplate");
 		}
-		catch(ClassNotFoundException e) {
+		catch (ClassNotFoundException e) {
 			// if exception, do nothing
 			e.printStackTrace();
 		}
 	}
 	
+	@Override
 	public Center getCenterByID(String id) {
 		
-		return mongoOperation.findOne(new Query(Criteria.where("centerID").is(id)), Center.class);
+		Query q = new Query(Criteria.where("centerID").is(id));
+		
+		return mongoOperation.findOne(q, Center.class);
 	}
 
-	/*
-	 * gets all centers
-	 */
+	@Override
 	public List<Center> getAllCenters() {
 		
 		// get all of the centers
 		List<Center> centers = mongoOperation.findAll(Center.class);
+		
 		return centers;
 	}
 	
-	/*
+	/**
 	 * Save or update center, not exposed by interface since the 
 	 * center information is never modified after creation. 
 	 */
@@ -59,14 +63,13 @@ public class CenterServiceImpl implements CenterService {
 		Query q = new Query(Criteria.where("centerID").is(c.getCenterID()));
 		Center check = mongoOperation.findOne(q, Center.class);
 		
-		if(check != null) {
+		if (check != null) {
 			check.setCenterID(c.getCenterID());
 			check.setGrant(c.getGrant());
 			check.setSiteURL(c.getSiteURL());
 			
 			mongoOperation.save(check);
-		}
-		else {
+		} else {
 			mongoOperation.save(c);
 		}
 	}

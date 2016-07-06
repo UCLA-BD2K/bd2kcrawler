@@ -15,19 +15,35 @@ import name.fraser.neil.plaintext.diff_match_patch.Diff;
  */
 public class Digester {
 	
-	// 2 input strings
+	/**
+	 * Left-hand string to use as base.
+	 */
 	private String stringOne;
+	
+	/**
+	 * Right-hand string to use as comparison to the base.
+	 */
 	private String stringTwo;
 	
-	// delegation
+	/**
+	 * Delegation object to apply diff-match-patch.
+	 */
 	diff_match_patch digest = new diff_match_patch();
 	
-	// cstrs
+	/**
+	 * No-arg constructor.
+	 */
 	public Digester() {
 		super();
 		this.stringOne = "";
 		this.stringTwo = "";
 	}
+	
+	/**
+	 * Constructor taking in strings to compare.
+	 * @param stringOne the base string
+	 * @param stringTwo the string to compare against the base string.
+	 */
 	public Digester(String stringOne, String stringTwo) {
 		super();
 		this.stringOne = stringOne;
@@ -35,6 +51,7 @@ public class Digester {
 	}
 	
 	// getters and setters
+	
 	public String getStringOne() {
 		return stringOne;
 	}
@@ -48,16 +65,13 @@ public class Digester {
 		this.stringTwo = stringTwo;
 	}
 	
-	// functions to compute a human readable diff
-	
-	/* returns HTML string, auto-generated of the diffs */
+	/** 
+	 * Returns a human readable "diff" in HTML format.
+	 * */
 	public String computeHTMLDiff() {
-		
 		LinkedList<Diff> diffs = digest.diff_main(this.stringOne, this.stringTwo);
 		digest.diff_cleanupSemantic(diffs);
 		return digest.diff_prettyHtml(diffs);
-		
-
 	}
 	
 	

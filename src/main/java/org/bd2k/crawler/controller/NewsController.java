@@ -40,14 +40,14 @@ public class NewsController {
 	@Autowired
 	private CenterService centerService;
 	
-	//class crawler and digester
+	// class crawler
 	private static BD2KCrawler crawler;
 	
 	private final int CRAWLER_RUNNING = 1;
 	private final int CRAWLER_IDLE = 0;
 	private final String host = "127.0.0.1:8080/BD2KCrawler";
 		
-	/*
+	/**
 	 * Checks all websites and checks if there are any changes since the last check. 
 	 * If the process is already running, it should return the status.
 	 */
@@ -64,7 +64,7 @@ public class NewsController {
 		DateFormat df = new SimpleDateFormat("MM/dd/yyyy HH:mm:ss");
 		String crawlStartTime = df.format(new Date());
 		
-		for(int i = 0; i < seeds.length; i++) {
+		for (int i = 0; i < seeds.length; i++) {
 			seeds[i] = centers.get(i).getSiteURL();
 		}
 		
@@ -86,7 +86,7 @@ public class NewsController {
 			String attachment = "";
 			
 			//if crawler is idle, then iteratively crawl all centers
-			for(int i = 0; i < seeds.length; i++) {
+			for (int i = 0; i < seeds.length; i++) {
 				
 				String[] currSeed = {seeds[i]};			//for each site
 				
@@ -99,12 +99,12 @@ public class NewsController {
 				
 				try {
 					
-					crawlerResults = BD2KCrawler.crawl();	//blocks here until crawl complete
+					crawlerResults = BD2KCrawler.crawl();	// blocks here until crawl complete
 					
-					//add to the email body
+					// add to the email body
 					body += "\n--------Center: " + crawler.getCenterID() + "--------\n";
 					body += formatCrawlResultsForEmail(crawlerResults); 
-				} catch(Exception e) {
+				} catch (Exception e) {
 					e.printStackTrace();
 				}
 			}
@@ -119,7 +119,7 @@ public class NewsController {
 		return "[ OK ]: Crawl complete.";
 	}
 	
-	/*
+	/**
 	 * Only checks the website associated with {id}.
 	 */
 	@RequestMapping(value="/news/update/{id}", method=RequestMethod.GET) 
@@ -130,15 +130,15 @@ public class NewsController {
 		
 		List<Center> centers = centerService.getAllCenters();
 		String seedURL = null;
-		for(Center c : centers) {
+		for (Center c : centers) {
 			System.out.println(c.getCenterID());
-			if(c.getCenterID().equals(id)) {
+			if (c.getCenterID().equals(id)) {
 				seedURL = c.getSiteURL();
 				break;
 			}
 		}
 		
-		//if a valid center id, proceed
+		// if a valid center id, proceed
 		if(seedURL!=null) {
 			String[] seeds = {seedURL};
 			String[] excludes = {};
@@ -146,30 +146,29 @@ public class NewsController {
 			DateFormat df = new SimpleDateFormat("MM/dd/yyyy HH:mm:ss");
 			String crawlStartTime = df.format(new Date());
 			
-			//crawler can be null if no other crawls started
-			if(crawler == null) {
+			// crawler can be null if no other crawls started
+			if (crawler == null) {
 				crawler = new BD2KCrawler(id, seedURL, seeds, excludes);
 				
-				//Crawler is running!!!
-				if(crawler.getCrawlerStatus() == CRAWLER_RUNNING) {
+				// Crawler is running!!!
+				if (crawler.getCrawlerStatus() == CRAWLER_RUNNING) {
 					return "[ ! ]: Crawler is already running, please try again later.";
 				}
 				
-				//attempt to crawl
+				// attempt to crawl
 				try {
 					crawlerResults = BD2KCrawler.crawl();
 				} catch (Exception e) {
-					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
-			} else if(crawler.getCrawlerStatus() ==  CRAWLER_RUNNING) {
+			} else if (crawler.getCrawlerStatus() ==  CRAWLER_RUNNING) {
 				return "[ ! ]: Crawler is already running, please try again later.";
 			} else {
-				//crawler exists and is idle, so just run it
+				// crawler exists and is idle, so just run it
 				crawler = new BD2KCrawler(id, seedURL, seeds, excludes);
 				try {
 					crawlerResults = BD2KCrawler.crawl();
-				} catch(Exception e) {
+				} catch (Exception e) {
 					e.printStackTrace();
 				}
 			}
@@ -198,7 +197,7 @@ public class NewsController {
 		return "[ OK ]: Crawl complete.";
 	}
 	
-	/*
+	/**
 	 * Allows the viewers to see what the diffs are from all websites.
 	 */
 	@RequestMapping(value="/news/changes", method=RequestMethod.GET) 
@@ -206,14 +205,14 @@ public class NewsController {
 			@RequestParam(value="limit", required=false) Integer limit,
 			@RequestParam(value="offset", required=false) Integer offset) {
 		
-		if(limit != null && offset != null) {
+		if (limit != null && offset != null) {
 			return pageService.getAllPagesLimOff(limit, offset);
 		}
 		
 		return pageService.getAllPages();
 	}
 	
-	/*
+	/**
 	 * Allows the viewers to see what the diffs are from the website associated with [id].
 	 */
 	@RequestMapping(value="/news/changes/{id}", method=RequestMethod.GET) 
@@ -222,14 +221,14 @@ public class NewsController {
 			@RequestParam(value="limit", required=false) Integer limit,
 			@RequestParam(value="offset", required=false) Integer offset) {
 			
-		if(limit != null && offset != null) {
+		if (limit != null && offset != null) {
 			return pageService.getPagesByCenterIDLimOff(limit, offset, id);
 		}
 		
 		return pageService.getPagesByCenterID(id);
 	}
 	
-	/*
+	/**
 	 * Allows viewers to see the status of the crawler
 	 */
 	@RequestMapping(value="/news/crawlerStatus")
@@ -237,7 +236,7 @@ public class NewsController {
 		
 		int status = new BD2KCrawler().getCrawlerStatus();
 		
-		if(status == CRAWLER_RUNNING) {
+		if (status == CRAWLER_RUNNING) {
 			return "Crawler is currently running...";
 		}
 		
@@ -245,7 +244,7 @@ public class NewsController {
 		
 	}
 	
-	/*
+	/**
 	 * Allows moderators to request that the crawler be stopped.
 	 */
 	@RequestMapping(value="/news/crawlerStop")
@@ -254,7 +253,7 @@ public class NewsController {
 		return "Crawler stopped: " + BD2KCrawler.stopCrawling();
 	}
 	
-	/*
+	/**
 	 * Retrieves ALL pages - this is a dangerous function.
 	 */
 	@RequestMapping(value="/news/getAllPages")
@@ -263,7 +262,7 @@ public class NewsController {
 		return pageService.getAllPages();
 	}
 	
-	/*
+	/**
 	 * Retrieve all pages with a specified limit and offset.
 	 */
 	@RequestMapping(value="/news/getPages")
@@ -273,7 +272,7 @@ public class NewsController {
 		return pageService.getAllPagesLimOff(limit, offset);
 	}
 	
-	/*
+	/**
 	 * Retrieve pages for a given center and limit + offset
 	 */
 	@RequestMapping(value="/news/getPagesForCenter")
@@ -283,6 +282,7 @@ public class NewsController {
 	}
 	
 	/* Private helpers */
+	
 	private void sendCrawlResultsEmail(
 			String subject, String body, String attachment, 
 			List<String> recipients) {
@@ -292,7 +292,7 @@ public class NewsController {
 			Properties properties = PropertiesLoaderUtils.loadProperties(resource);
 			
 			Email.send(properties, recipients, subject, body, attachment);
-		} catch(Exception e) {
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
 		
@@ -303,11 +303,11 @@ public class NewsController {
 			
 		String formattedString = "\n";
 		
-		if(results.isEmpty()) {
+		if (results.isEmpty()) {
 			return formattedString + "NO CHANGES\n\n";
 		}
 		
-		for(Map.Entry<String, String> entry : results.entrySet()) {
+		for (Map.Entry<String, String> entry : results.entrySet()) {
 		
 			formattedString += entry.getKey() + " --> " +
 								"http://" + host + "/digestResults?id=" + 

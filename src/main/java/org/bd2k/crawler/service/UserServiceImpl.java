@@ -12,7 +12,9 @@ import org.springframework.stereotype.Service;
 public class UserServiceImpl implements UserService {
 	
 	// may need refactoring
-	private static ApplicationContext ctx = new AnnotationConfigApplicationContext(org.bd2k.crawler.config.MongoConfig.class);
+	private static ApplicationContext ctx = 
+			new AnnotationConfigApplicationContext(org.bd2k.crawler.config.MongoConfig.class);
+	
 	private static MongoOperations mongoOperation = (MongoOperations) ctx.getBean("mongoTemplate");
 
 	public User getUserByEmail(String email) {

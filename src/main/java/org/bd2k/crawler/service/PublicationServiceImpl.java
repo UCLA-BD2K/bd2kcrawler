@@ -15,7 +15,8 @@ import org.springframework.stereotype.Service;
 public class PublicationServiceImpl implements PublicationService {
 
 	// may need refactoring
-	private static ApplicationContext ctx = new AnnotationConfigApplicationContext(org.bd2k.crawler.config.MongoConfig.class);
+	private static ApplicationContext ctx = 
+			new AnnotationConfigApplicationContext(org.bd2k.crawler.config.MongoConfig.class);
 	private static MongoOperations mongoOperation = (MongoOperations) ctx.getBean("mongoTemplate");
 		
 	// for dynamically setting config for an instance of CenterService, useful for testing
@@ -24,8 +25,7 @@ public class PublicationServiceImpl implements PublicationService {
 			Class className = Class.forName(cls);
 			ctx = new AnnotationConfigApplicationContext(className);
 			mongoOperation = (MongoOperations) ctx.getBean("mongoTemplate");
-		}
-		catch(ClassNotFoundException e) {
+		} catch (ClassNotFoundException e) {
 			// if exception, do nothing
 			e.printStackTrace();
 		}
@@ -61,7 +61,7 @@ public class PublicationServiceImpl implements PublicationService {
 		Publication check = getPublicationByPmid(p.getPmid());
 		
 		// if there is already a publication stored
-		if(check != null) {
+		if (check != null) {
 			
 			check.setAuthors(p.getAuthors());
 			//check.setCenters(p.getCenters());
@@ -72,8 +72,7 @@ public class PublicationServiceImpl implements PublicationService {
 			//check.setLastCrawlTime(p.getLastCrawlTime());
 			
 			mongoOperation.save(check);
-		}
-		else {
+		} else {
 			
 			// need to store a new document
 			mongoOperation.save(p);
@@ -108,11 +107,15 @@ public class PublicationServiceImpl implements PublicationService {
 	@Override
 	public void saveOrUpdatePublicationResult(PublicationResult p) {
 
-		Query q = new Query(Criteria.where("centerID").is(p.getCenterID()));
-		PublicationResult check = mongoOperation.findOne(q, PublicationResult.class);
+		Query q = new Query(
+				Criteria.where("centerID").is(p.getCenterID()));
+		
+		PublicationResult check = 
+				mongoOperation.findOne(q, 
+						PublicationResult.class);
 		
 		// if a document exists, update
-		if(check != null) {
+		if (check != null) {
 			check.setCenterID(p.getCenterID());
 			check.setCurrentContent(p.getCurrentContent());
 			check.setFullContent(p.getFullContent());
@@ -120,11 +123,8 @@ public class PublicationServiceImpl implements PublicationService {
 			check.setLastDiff(p.getLastDiff());
 			
 			mongoOperation.save(check);
-		}
-		
-		// else insert new document
-		else {
-			
+		} else {
+			// else insert new document
 			mongoOperation.save(p);
 		}
 	}

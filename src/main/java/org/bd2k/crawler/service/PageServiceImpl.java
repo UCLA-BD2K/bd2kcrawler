@@ -15,7 +15,8 @@ import org.springframework.stereotype.Service;
 public class PageServiceImpl implements PageService {
 
 	// may need refactoring
-	private static ApplicationContext ctx = new AnnotationConfigApplicationContext(org.bd2k.crawler.config.MongoConfig.class);
+	private static ApplicationContext ctx = 
+			new AnnotationConfigApplicationContext(org.bd2k.crawler.config.MongoConfig.class);
 	private static MongoOperations mongoOperation = (MongoOperations) ctx.getBean("mongoTemplate");
 	
 	// for dynamically setting config for an instance of CenterService, useful for testing
@@ -24,8 +25,7 @@ public class PageServiceImpl implements PageService {
 			Class className = Class.forName(cls);
 			ctx = new AnnotationConfigApplicationContext(className);
 			mongoOperation = (MongoOperations) ctx.getBean("mongoTemplate");
-		}
-		catch(ClassNotFoundException e) {
+		} catch (ClassNotFoundException e) {
 			// if exception, do nothing
 			e.printStackTrace();
 		}
@@ -37,6 +37,7 @@ public class PageServiceImpl implements PageService {
 		return "[Archive Service Impl] I am alive";
 	}
 	
+	@Override
 	public Page getPageByID(String id) {
 		
 		// Get requested page
@@ -46,6 +47,7 @@ public class PageServiceImpl implements PageService {
 		return page;
 	}
 
+	@Override
 	public List<Page> getPagesByCenterID(String id) {
 		
 		// Retrieve from Database all archived pages for a given center id
@@ -56,6 +58,7 @@ public class PageServiceImpl implements PageService {
 		return pages;
 	}
 
+	@Override
 	public List<Page> getAllPages() {
 		
 		// Retrieve all pages -- warning this is a dangerous function
@@ -65,6 +68,7 @@ public class PageServiceImpl implements PageService {
 		return allPages;
 	}
 
+	@Override
 	public List<Page> getAllPagesLimOff(int limit, int offset) {
 		
 		// Retrieve all pages with the given limit and offset
@@ -77,6 +81,7 @@ public class PageServiceImpl implements PageService {
 		return pages;
 	}
 
+	@Override
 	public List<Page> getPagesByCenterIDLimOff(int limit, int offset, 
 			String id) {
 		
@@ -90,6 +95,7 @@ public class PageServiceImpl implements PageService {
 		return pages;
 	}
 
+	@Override
 	public Page getPageByURLandCenterId(String url, String id) {
 		
 		// Retrieve first matching page
@@ -102,26 +108,26 @@ public class PageServiceImpl implements PageService {
 		return page;
 	}
 	
+	@Override
 	public void savePage(Page p) {
 		
 		mongoOperation.save(p);
 	}
 
+	@Override
 	public void saveOrUpdatePage(Page p) {
 		
 		// Save the page if it does not exist, else update
 		Page check = getPageByURLandCenterId(p.getUrl(), p.getCenterID());
 		
-		//if the page exists in DB already
-		if(check != null) {
+		// if the page exists in DB already
+		if (check != null) {
 			check.setCurrentContent(p.getCurrentContent());
 			check.setLastCrawlTime(p.getLastCrawlTime());
 			check.setLastDiff(p.getLastDiff());
 			mongoOperation.save(check);
-		}
-		
-		//else insert page normally
-		else {
+		} else {
+			// else insert page normally
 			mongoOperation.save(p);
 		}
 		

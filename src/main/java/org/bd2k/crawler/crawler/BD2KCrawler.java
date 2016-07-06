@@ -44,39 +44,38 @@ import edu.uci.ics.crawler4j.url.WebURL;
  */
 public class BD2KCrawler extends WebCrawler {
 	
-	//cannot autowire because there will be instances to this class
+	// cannot autowire because there will be instances to this class
 	private PageService pageService = new PageServiceImpl();
 	
-	//some borrowed from https://github.com/UCLA-BD2K/BD2K-Digester
+	// some borrowed from https://github.com/UCLA-BD2K/BD2K-Digester
 	private final static int NUM_CRAWLERS = 1;
     private final static String USER_AGENT_NAME = "UCLA BD2K";
     private final static String CRAWLER_STORAGE = "temp/crawl/storage";
     private final static String LINCS_ID = "LINCS-DCIC";
     private final static String LINCS_URL = "http://lincs-dcic.org/";
-    //private final static String LINCS_ID = "TestCenter";
     private final static Pattern FILTERS = Pattern.compile(".*(\\.(css|js|gif|jpg"
             + "|png|mp3|mp3|zip|gz))$");
     
-    //members
+    // members
     private static String centerID;	
     private static String domain;		//similar to rootURL from previous crawler
     private static String[] seedURLs;
     private static String[] excludedURLs;
     
-    //controller to expose control over the crawler from outside
+    // controller to expose control over the crawler from outside
     private static CrawlController controller = null;
     
-    //for use on sites that hold content in javascript, rather than html (LINCS-DCIC)
-    //represents JS files that were already visited
+    // for use on sites that hold content in javascript, rather than html (LINCS-DCIC)
+    // represents JS files that were already visited
     private static Set<String> visitedJS = new HashSet<String>();
     
-    //for aggregating results for the current run, returned by crawl()
+    // for aggregating results for the current run, returned by crawl()
     private static Map<String, String> changes = new HashMap<String, String>();
     
-    //for generating timestamps
+    // for generating timestamps
     private DateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ");
     
-    public BD2KCrawler() {}	//should be avoided, or used in unison for initDefault()
+    public BD2KCrawler() {}	// should be avoided, or used in unison for initDefault()
  
     public BD2KCrawler(String centerID, String domain, String[] seedURLs, String[] excludedURLs) {
 		super();
@@ -104,23 +103,23 @@ public class BD2KCrawler extends WebCrawler {
     	 
          String href = url.getURL().toLowerCase();	
          
-         //skip filter file types by default (e.g. css, js, zip, etc.)
-         if(FILTERS.matcher(href).matches()) {
+         // skip filter file types by default (e.g. css, js, zip, etc.)
+         if (FILTERS.matcher(href).matches()) {
         	 return false;
          }
          
-         //only check for files in the domain (e.g. https://bd2kccc.org)
-         if(!href.startsWith(BD2KCrawler.domain)) {
+         // only check for files in the domain (e.g. https://bd2kccc.org)
+         if (!href.startsWith(BD2KCrawler.domain)) {
         	 return false;
          }
          
-         //skip specified urls to exclude
-         for(int i = 0; i < excludedURLs.length; i++) {
+         // skip specified urls to exclude
+         for (int i = 0; i < excludedURLs.length; i++) {
         	 if(href.startsWith(excludedURLs[i]))
         		 return false;
          }
          
-         return true;	//page is OK to crawl
+         return true;	// page is OK to crawl
      }
     
      /**
@@ -146,14 +145,15 @@ public class BD2KCrawler extends WebCrawler {
              String lastDiff = "";
              String currentContent = cleanText(text);
 
-             org.bd2k.crawler.model.Page p = pageService.getPageByURLandCenterId(url, BD2KCrawler.centerID);         
+             org.bd2k.crawler.model.Page p = pageService.getPageByURLandCenterId(url, 
+            		 BD2KCrawler.centerID);         
             
              // if there is already an entry in the DB for this url+center combo,
              // need to compute a new diff (here, HTML string representation)
-             if(p != null) {
+             if (p != null) {
             	 
             	 // check if there is no change, skip generating diff
-            	 if(!currentContent.equals(p.getCurrentContent())) {
+            	 if (!currentContent.equals(p.getCurrentContent())) {
             		 Digester d = new Digester(p.getCurrentContent(), currentContent);
                 	 lastDiff = d.computeHTMLDiff(); 
                 	 changes.put(url, p.getId());	// log the change
@@ -181,14 +181,14 @@ public class BD2KCrawler extends WebCrawler {
              pageService.savePage(p);
                           
              // if LINCS-DCIC (or other site with JS generated content)
-             if(this.getCenterID().equals(LINCS_ID)) {
+             if (this.getCenterID().equals(LINCS_ID)) {
             	 
             	 // get DOM representation
             	 Document doc = Jsoup.parseBodyFragment(htmlParseData.getHtml());
             	 Elements scripts = doc.getElementsByTag("script");
             	 
             	 // iterate through all scripts
-            	 for(Element ele: scripts) {
+            	 for (Element ele: scripts) {
             		 
             		 String src = ele.attr("src");
             		 
@@ -201,7 +201,8 @@ public class BD2KCrawler extends WebCrawler {
             			 
             			 // no need to parse into objects, we will store as is = string
             			 lastCrawlTime = df.format(new Date());
-            			 p = pageService.getPageByURLandCenterId(LINCS_URL+src, this.getCenterID());
+            			 p = pageService.getPageByURLandCenterId(LINCS_URL+src, 
+            					 this.getCenterID());
             			         			 
             			 try {
             				 
@@ -209,9 +210,10 @@ public class BD2KCrawler extends WebCrawler {
             				 currentContent = req.asString().getBody();
             				 
             				 // if there is an existing entry in DB, check for new diff
-            				 if(p != null) {
-            					 if(!currentContent.equals(p.getCurrentContent())) {
-            						 Digester d = new Digester(p.getCurrentContent(), currentContent);
+            				 if (p != null) {
+            					 if (!currentContent.equals(p.getCurrentContent())) {
+            						 Digester d = new Digester(p.getCurrentContent(), 
+            								 currentContent);
             						 lastDiff = d.computeHTMLDiff();
             						 changes.put(LINCS_URL + src, p.getId());
             					 } else {
@@ -235,10 +237,10 @@ public class BD2KCrawler extends WebCrawler {
             				 // save/update
             				 pageService.savePage(p);
             				 
-            			 } catch(UnirestException e) {
+            			 } catch (UnirestException e) {
             				 System.out.println("Error in req.asString()");
             				 e.printStackTrace();
-            			 } catch(Exception e) {
+            			 } catch (Exception e) {
             				 e.printStackTrace();
             			 }
             		 }
@@ -285,8 +287,8 @@ public class BD2KCrawler extends WebCrawler {
 	/* Crawl handler, exposed as a public method */
     public static Map<String, String> crawl() throws Exception {
     	
-    	// do a quick check to see if crawler is already running -- added safety, not required
-    	if(controller != null) {
+    	// do a quick check to see if crawler is already running
+    	if (controller != null) {
   
     		return null;	
     	}
@@ -307,7 +309,7 @@ public class BD2KCrawler extends WebCrawler {
     	controller = new CrawlController(config, pf, robotstxtServer);
     	
     	// add the seeds to indicate where crawler should start
-    	for(int i = 0; i < seedURLs.length; i++) {
+    	for (int i = 0; i < seedURLs.length; i++) {
     		controller.addSeed(seedURLs[i]);
     	}
     	
@@ -328,7 +330,7 @@ public class BD2KCrawler extends WebCrawler {
     public static boolean stopCrawling() {
     	
     	// if there is no crawler, then "stopping" technically succeeds
-    	if(controller == null) {
+    	if (controller == null) {
     		return true;
     	}
     	
@@ -343,7 +345,7 @@ public class BD2KCrawler extends WebCrawler {
     // 1=running, 0=idle
     public int getCrawlerStatus() {
     	
-    	if(controller != null) {
+    	if (controller != null) {
     		return 1;	//crawler is running
     	}
     	
@@ -365,7 +367,7 @@ public class BD2KCrawler extends WebCrawler {
     	
     	controller = null;
     	
-    	if(visitedJS != null) {
+    	if (visitedJS != null) {
     		visitedJS.clear();
     	}
     }

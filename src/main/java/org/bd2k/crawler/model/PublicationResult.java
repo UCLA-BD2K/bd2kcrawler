@@ -22,7 +22,8 @@ public class PublicationResult {
 	
 	public PublicationResult(){}
 	
-	public PublicationResult(String centerID, String lastCrawlTime, String[] currentContent, String[] lastDiff,
+	public PublicationResult(String centerID, String lastCrawlTime, String[] currentContent, 
+			String[] lastDiff,
 			Publication[] fullContent) {
 		super();
 		this.centerID = centerID;

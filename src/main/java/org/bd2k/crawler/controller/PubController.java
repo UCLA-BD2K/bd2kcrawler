@@ -40,7 +40,7 @@ public class PubController {
 	
 	private DateFormat df;
 	
-	/*
+	/**
 	 * Checks all publications and checks if there are any changes since the last check. 
 	 * If the process is already running, it should return the status.
 	 */
@@ -57,14 +57,14 @@ public class PubController {
 		// results of the crawler, init to bypass uninitialized warning
 		Map<String, String> results = new HashMap<String,String>();
 		
-		if(crawler.getCrawlerStatus() == CRAWLER_RUNNING) {
+		if (crawler.getCrawlerStatus() == CRAWLER_RUNNING) {
 			
 			return "[ ! ] Crawler is already running, please try again later";
 		}
 		
 		try {
 			 results = BD2KPubCrawler.crawl();
-		} catch(Exception e) {
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
 		
@@ -85,7 +85,7 @@ public class PubController {
 		return formatCrawlResultsForEmail(results);	//temp for viewing
 	}
 	
-	/*
+	/**
 	 * Only checks the publications associated with [id].
 	 */
 	@RequestMapping(value="/pub/update/{id}", method=RequestMethod.GET)
@@ -105,14 +105,14 @@ public class PubController {
 		// sentinel object used for non-blocking check of status
 		BD2KPubCrawler crawler = new BD2KPubCrawler();
 		
-		if(crawler.getCrawlerStatus() == CRAWLER_RUNNING) {
+		if (crawler.getCrawlerStatus() == CRAWLER_RUNNING) {
 			
 			return "[ ! ] Crawler is already running, please try again later";
 		}
 		
 		try {
 			 results = BD2KPubCrawler.crawl();
-		} catch(Exception e) {
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
 		
@@ -133,7 +133,7 @@ public class PubController {
 		return formatCrawlResultsForEmail(results);	//temp for viewing
 	}
 	
-	/*
+	/**
 	 * Allows the viewers to see what the diffs are from all publications.
 	 */
 	@RequestMapping(value="/pub/changes", method=RequestMethod.GET)
@@ -142,7 +142,7 @@ public class PubController {
 		return publicationService.getAllPublicationResults();
 	}
 	
-	/*
+	/**
 	 * Allows the viewers to see what the diffs are from the publications associated with [id].
 	 */
 	@RequestMapping(value="/pub/changes/{id}", method=RequestMethod.GET)
@@ -155,7 +155,7 @@ public class PubController {
 		
 	}
 	
-	/*
+	/**
 	 * Returns the current status of the crawler in text representation.
 	 */
 	@RequestMapping(value="/pub/crawlerStatus")
@@ -164,7 +164,7 @@ public class PubController {
 		BD2KPubCrawler crawler = new BD2KPubCrawler();
 		
 		// accessing it this way prevents any blocking due to class crawling
-		if(crawler.getCrawlerStatus() == CRAWLER_RUNNING) {
+		if (crawler.getCrawlerStatus() == CRAWLER_RUNNING) {
 			return "Crawler is currently running.";
 		}
 		
@@ -173,6 +173,7 @@ public class PubController {
 	}
 	
 	/* private helpers */
+	
 	private void sendCrawlResultsEmail(
 			String subject, String body, String attachment, 
 			List<String> recipients) {
@@ -182,7 +183,7 @@ public class PubController {
 			Properties properties = PropertiesLoaderUtils.loadProperties(resource);
 			
 			Email.send(properties, recipients, subject, body, attachment);
-		} catch(Exception e) {
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
 		
@@ -191,12 +192,12 @@ public class PubController {
 	private String formatCrawlResultsForEmail(Map<String, String> results) {
 		
 		//formats specific to the pubmed crawl results.
-		if(results.isEmpty()) {
+		if (results.isEmpty()) {
 			return "NO CHANGES.";
 		}
 		
 		String ret = "";
-		for(Map.Entry<String, String> entry : results.entrySet()) {
+		for (Map.Entry<String, String> entry : results.entrySet()) {
 			ret += (
 					"(" + entry.getKey() + ")" + " " + entry.getValue() + "\n\n"
 					);
