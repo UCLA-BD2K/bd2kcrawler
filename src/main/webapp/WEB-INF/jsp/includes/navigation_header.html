@@ -1,3 +1,4 @@
+<div id="nav">
 <div class="navbar-header">
    <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
      <span class="sr-only">Toggle navigation</span>
@@ -15,8 +16,8 @@
    	<li><a href="#" onclick="$('#logout-form').submit()">Logout (${ user })</i></a></li>
    </ul>
  </div>
- 
- <form action="<c:url value="/logout"></c:url>" method="post" class="hidden" id="logout-form">
+ </div>
+ <form action='<c:url value="/logout"></c:url>' method="post" class="hidden" id="logout-form">
   		<input type="submit" value="Logout"/>
   		<input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"/>
 </form>

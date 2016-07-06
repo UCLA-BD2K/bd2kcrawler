@@ -1,13 +1,137 @@
 @CHARSET "UTF-8";
+@import url(https://fonts.googleapis.com/css?family=Arimo:400,700);
 
+/* global defaults */
+body, html {
+	background-color: #e9ece5;
+	color: #312c32;
+	font-family: 'Arimo', sans-serif;
+	height: 100%;
+}
+
+a {
+	color:white;
+}
+a:focus, a:hover {
+	color: #312c32;
+}
+
+.brand-blue {
+	background-color: #98dafc;
+}
+.brand-brown {
+	background-color: #daad86;
+}
+.container a , .container-fluid a {
+	color: #312c32;
+}
+#main {
+	margin-top:50px;
+}
+#nav, #sidebar {
+	background-color:#3b3a36;
+	position: fixed;
+	z-index:2;
+}
+#nav {
+	left:0;
+	right:0;	
+	top:0;	
+	-webkit-box-shadow: -1px 4px 16px -4px rgba(0,0,0,0.75);
+-moz-box-shadow: -1px 4px 16px -4px rgba(0,0,0,0.75);
+box-shadow: -1px 4px 16px -4px rgba(0,0,0,0.75);
+color:white;
+}
+#nav a {
+	color:white;
+}
+#nav a:hover, #nav li:hover {
+	background-color:transparent;
+	color: #949492;
+}
+a#navbar-brand:hover {
+	color:white;
+}
+.pagination>.active>a, .pagination>.active>a:focus, .pagination>.active>a:hover, .pagination>.active>span, .pagination>.active>span:focus, .pagination>.active>span:hover {
+	background-color: #3b3a36;
+    border-color: #3b3a36;
+}
+.pagination>li>a, .pagination>li>span {
+	color: #3b3a36;
+}
+#sidebar {
+	position:fixed;
+	left:0;
+	bottom: 0;
+	top: 50px;
+	color:white;
+	border-right: 2px inset #4a4a48;
+}
+#sidebar .list-group {
+	list-style-type:none;
+	padding-top:15px;
+}
+#sidebar .list-group-item {
+	background-color:transparent;
+	border:none;
+	border-bottom: 2px solid gray;
+	border-radius:5px;
+}
+#sidebar .list-group-header {
+	margin: 10px 0;
+	text-align:center;
+	font-size: 1.2em;
+}
+
+#sidebar .list-group-item:hover {
+	background-color: transparent;
+	color: #949492;
+}
+#sidebar .list-group-item a {
+	display:inline-block;
+	width:100%;
+}
+#sidebar .list-group-item a:hover {
+	color: #949492;
+	text-style:none;
+	cursor:pointer;
+}
+#sidebar .list-group-item, #sidebar .list-group-item a {
+	color:white;
+}
+#sidebar .list-group-item.active {
+	background-color:#1D1D1B;
+}
+.ui-accordion {
+	
+}
+h3.ui-accordion-header {
+	font-size:16px;
+}
+.ui-accordion-header.ui-state-hover {
+	cursor:pointer;
+}
 /* all custom site css goes here */
 #login-form {
 		border:2px solid #d3d3d3;
 		border-radius: 5px;
-		padding:15px;
+		padding: 15px;
+		background-color: white;
+		margin-top: 80px;
+		-webkit-animation-duration: 1s;
+		-moz-animation-duration: 1s;
+		-o-animation-duration: 1s;
+		animation-duration: 1s;
+		
+		-webkit-animation-delay: 0;
+		-moz-animation-delay: 0;
+		-o-animation-delay: 0;
+		animation-delay: 0;
+		
+		
 }
 #search-form {
-	padding:5px;
+	padding:10px 20px;
 }
 #search-results, #digest-result-container {
 	min-height:400px

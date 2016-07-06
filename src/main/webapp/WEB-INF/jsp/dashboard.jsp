@@ -15,107 +15,24 @@
 
 <body>
 
+	<%@ include file="includes/navigation_header.html" %>
 	<div class="container-fluid">
-		
-		<%@ include file="includes/navigation_header.html" %>
-         
-          <div class="container">
-          
-          <div class="row">
-          	<div id="search-form" class="col-sm-12">
-          		<div class="">
-          			<h3 id="site-crawler">Site Crawler status: <span id="crawler-status"></span><i class="fa fa-spinner fa-spin"></i></i></h3>
-          			<h3 id="pub-crawler">Publication Crawler status: <span id="crawler-status-pub"></span><i class="fa fa-spinner fa-spin"></i></i></h3>
-          			<h4>Filter results below:</h4>
-          			<div class="form-group">
-          				<c:choose>
-          					<c:when test='${ type.equals("sites") == true }'>
-          						<label class="radio-inline">
-          							<input type="radio" value="sites" name="type" checked="checked">Sites
-          						</label>
-          						<label class="radio-inline">
-          							<input type="radio" value="publications" name="type">Publications
-          						</label>
-          					</c:when>
-          					<c:otherwise>
-          						<label class="radio-inline">
-          							<input type="radio" value="sites" name="type">Sites
-          						</label>
-          						<label class="radio-inline">
-          							<input type="radio" value="publications" name="type" checked="checked">Publications
-          						</label>
-          					</c:otherwise>
-          				</c:choose>
-          					
-          			</div>
-          			<form action="" method="GET" id="dashboard-form">
-          				<div class="form-group">
-          					<label for="center-select">Center:</label> 
-          					<select name="center" id="center-select">
-          						<option value="all">All</option>
-          						<c:forEach items="${bd2kCenters}" var="center">
-          							<c:choose>
-          								<c:when test="${ center.equals(chosenCenter) }">
-          									<option value="${center}" selected="selected">${center}</option>
-          								</c:when>
-          								<c:otherwise>
-          									<option value="${center}">${center}</option>
-          								</c:otherwise>
-          							</c:choose>
-          						</c:forEach>
-          					</select>
-          				</div>
-          				<!--  <div class="form-group" style="display:none">
-          					<label for="center-select">Grant:</label> 
-          					<select name="grant" id="center-select">
-          						<option value="any">Any</option>
-          						<c:forEach items="${grantList}" var="grant">
-          							<option value="${grant}">${grant}</option>
-          						</c:forEach>
-          					</select>
-          				</div>-->
-          				<div class="form-group">
-          					<input type="submit" value="Search" />
-          				</div>
-          			</form>
-          		</div>
-          		<hr />
+          <div class="row" id="main">
+          	<div class="col-sm-2" id="sidebar">
+          	<div>
+          		<ul class="list-group">
+          			<li class="list-group-header">Crawler Dashboard</li>
+          			<li class="list-group-item">
+          				<a href="/BD2KCrawler/siteCrawler">Site Crawler</a>
+          			</li>
+          			<li class="list-group-item"><a href="/BD2KCrawler/pubCrawler">Publication Crawler</a></li>
+          		</ul>
           	</div>
-			</div>
-				<div class="row">	
-          			<div class="col-sm-12">
-          				Results (Showing max 20):
-          				<div id="search-results">
-          					<ul class="list-group">
-          						<c:forEach items="${ results }" var="ele">
-          							<li class='list-group-item'>
-          								<a href="/BD2KCrawler/digestResults?id=${ ele.getId() }">
-          									[ ${ ele.getLastCrawlTime() } ]: ${ ele.getUrl() }
-          								</a>
-          							</li>
-          						</c:forEach>
-          					</ul>
-          				</div>
-          			</div>
-          		</div>
-          		<div class="text-center">
-          			<!-- pagination -->
-       				<nav>
- 		 				<ul class="pagination">
- 		 					<c:choose>
- 		 					<c:when test="${pageNum-1 > 0}">
- 		 						<li class=""><a href="dashboard?type=${ type }&center=${ chosenCenter }&page=${pageNum-1}" aria-label="Previous"><span aria-hidden="true">&laquo;</span></a></li>
- 		 					</c:when>
-    						<c:otherwise>
-    							<li class="disabled"><a href="#" aria-label="Previous"><span aria-hidden="true">&laquo;</span></a></li>
-    						</c:otherwise>
-    						</c:choose>
-    						<li class="active"><a href="#">${pageNum} <span class="sr-only">(current)</span></a></li>
-    						<li><a href="dashboard?type=${ type }&center=${ chosenCenter }&page=${pageNum+1}" aria-label="Next"><span aria-hidden="true">&raquo;</span></a></li>
-  						</ul>
-					</nav>
-          		</div>
           	</div>
+          	<div class="col-sm-10 col-sm-offset-2">
+          		<h1>Welcome to the BD2KCrawler</h1>
+          	</div>
+		</div>
        </div>
 </body>
 

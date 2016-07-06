@@ -14,6 +14,7 @@
 </head>
 <body>
 	<div class="container-fluid">
+		<div id="nav">
 		<div class="navbar-header">
             <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
               <span class="sr-only">Toggle navigation</span>
@@ -31,13 +32,14 @@
               <li class="active"><a href="#">Login</a></li>
             </ul>
           </div>
+          </div>
           
           <div class="container">
           	<div class="row">
           		<div class="col-sm-3"></div>
           		
           		<div class="col-sm-6">
-          			<div id="login-form">
+          			<div id="login-form" class="animated fadeIn">
           				<h4>Login:</h4>
           				<c:if test="${ error }">
           					<div class="alert alert-danger">Invalid Credentials. Please try again.</div>
