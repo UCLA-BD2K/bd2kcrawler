@@ -189,7 +189,13 @@ public class BD2KPubCrawler {
 					pResult.setLastDiff(currentContent.toArray(new String[currentContent.size()]));
 				}
 				
-				publicationService.savePublicationResult(pResult);
+				// update
+				check.setCurrentContent(pResult.getCurrentContent());
+				check.setFullContent(pResult.getFullContent());
+				check.setLastCrawlTime(pResult.getLastCrawlTime());
+				check.setLastDiff(pResult.getLastDiff());
+				
+				publicationService.savePublicationResult(check);
 				
 			}
 			else {	// else everything found was new
