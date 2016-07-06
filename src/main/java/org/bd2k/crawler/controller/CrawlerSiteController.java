@@ -1,10 +1,18 @@
 package org.bd2k.crawler.controller;
 
 import java.security.Principal;
+import java.util.ArrayList;
 import java.util.List;
 
+import javax.servlet.http.HttpServletResponse;
+
+import org.bd2k.crawler.model.Center;
 import org.bd2k.crawler.model.Page;
+import org.bd2k.crawler.model.Publication;
+import org.bd2k.crawler.model.PublicationResult;
+import org.bd2k.crawler.service.CenterService;
 import org.bd2k.crawler.service.PageService;
+import org.bd2k.crawler.service.PublicationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -22,6 +30,12 @@ import org.springframework.web.bind.annotation.RequestParam;
 public class CrawlerSiteController {
 	@Autowired
 	private PageService pageService;
+	
+	@Autowired
+	private CenterService centerService;
+	
+	@Autowired
+	private PublicationService publicationService;
 
 
 	/* for testing functionality */
@@ -47,8 +61,7 @@ public class CrawlerSiteController {
 		
 		if(error != null) {
 			model.addAttribute("error", true);
-		}
-		else if(logout != null) {
+		} else if(logout != null) {
 			model.addAttribute("logout", true);
 		}
 		
@@ -57,10 +70,17 @@ public class CrawlerSiteController {
 	
 	/* dashboard */
 	@RequestMapping(value="/dashboard", method=RequestMethod.GET) 
+	public String getDashboardPage(Principal p, Model model) {
+		
+		model.addAttribute("user", p.getName());
+		
+		return "dashboard";
+	}
+	
+	@RequestMapping(value="/siteCrawler", method=RequestMethod.GET) 
 	public String getDashboardPage(Principal p, Model model,
 			@RequestParam(value="page", required=false) Integer pageNum,
-			@RequestParam(value="center", required=false) String center,
-			@RequestParam(value="type", required=false) String type) {
+			@RequestParam(value="center", required=false) String center) {
 		
 		//principal will always exist as this page requires ROLE_USER/ADMIN
 		
@@ -68,11 +88,7 @@ public class CrawlerSiteController {
 		String[] bd2kCenters = {"BDDS", "BDTG", "CCD", "CEDAR", "CPCP", "ENIGMA",
 				"HeartBD2K", "KnowEng", "LINCS-DCIC", "LINCS-TG", "MD2K", "Mobilize",
 				"PIC-SURE"};
-		
-		String[] grantList = { "EB020406", "HG007990", "HG008540", "AI117925", 
-				"AI117924", "EB020403", "GM114833", "GM114838", "HL127624", 
-				"HL127366", "EB020404", "EB020405", "HG007963"};
-		
+				
 		int resultsPerPage = 20;	//results to show per page
 		
 		//default to first page
@@ -82,10 +98,6 @@ public class CrawlerSiteController {
 		
 		if(center == null) {
 			center = "all";
-		}
-		
-		if(type == null) {
-			type = "sites";
 		}
 		
 		//get default results, most recent 20
@@ -106,24 +118,94 @@ public class CrawlerSiteController {
 		
 		//set model attributes for view
 		model.addAttribute("bd2kCenters", bd2kCenters);
-		model.addAttribute("grantList", grantList);
+		//model.addAttribute("grantList", grantList);
 		model.addAttribute("pageNum", pageNum);
 		model.addAttribute("results", results);
 		model.addAttribute("chosenCenter", center);
-		model.addAttribute("type", type);
 		model.addAttribute("user", p.getName());
 		
-		return "dashboard";
+		return "siteCrawler";
+	}
+	
+	@RequestMapping(value="/pubCrawler")
+	public String getPubCrawler(
+			Principal p, 
+			Model model,
+			@RequestParam(value="center", required=false) String center) {
+				
+		if(center == null) {
+			center = "all";
+		}
+		
+		// get center ids
+		List<Center> centers = centerService.getAllCenters();
+		String[] centerIDs = new String[centers.size()];
+		
+		for(int i = 0; i < centerIDs.length; i++) {
+			centerIDs[i] = centers.get(i).getCenterID();
+		}
+		
+		List<PublicationResult> results;
+		
+		if(center.equals("all")) {
+			// get results
+			results = 
+					publicationService.getAllPublicationResults();
+		} else {
+			results = new ArrayList<PublicationResult>();
+			results.add(publicationService.getPublicationResultByCenterID(center));
+		}
+
+		// set model attributes
+		model.addAttribute("user", p.getName());
+		model.addAttribute("bd2kCenters", centerIDs);
+		model.addAttribute("chosenCenter", center);
+		model.addAttribute("results", results);
+		
+		return "publicationCrawler";
 	}
 	
 	/* results */
 	@RequestMapping(value="/digestResults")
 	public String getDigestResults(Principal principal,
-			Model model, @RequestParam("id") String id) {
+			HttpServletResponse res,
+			Model model, 
+			@RequestParam(value = "id", required=false) String id,
+			@RequestParam(value="pmid", required = false) String pmid,
+			@RequestParam(value="center", required= false) String center) {
+	
+		if(id != null) {
+			// the id is the same as the value in _id, and we want a Page
+			Page p = pageService.getPageByID(id);
+			model.addAttribute("page", p);
+			model.addAttribute("type", "page");
+		} else if(pmid != null && center != null){
+			// we want a publication result
+			Publication pub = null;
+			PublicationResult pr = publicationService.getPublicationResultByCenterID(center);
+			
+			if(pr != null) {
+				
+				// find the requested publication record
+				for(Publication p : pr.getFullContent()) {
+					if(p.getPmid().equals(pmid)) {
+						pub = p;
+						break;
+					}
+				}
+				
+				model.addAttribute("publication", pub);
+				model.addAttribute("type", "publication");
+				model.addAttribute("center", center);
+				model.addAttribute("lastCrawlTime", pr.getLastCrawlTime());
+			} else {
+				res.setStatus(404);
+			}
+		} else {
+			// how shall we handle 404s?
+			res.setStatus(404);
+		}
 		
-		//the id is the same as the value in _id
-		Page p = pageService.getPageByID(id);
-		model.addAttribute("page", p);
 		model.addAttribute("user", principal.getName());
 		
 		return "digest";

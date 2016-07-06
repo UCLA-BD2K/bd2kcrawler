@@ -105,12 +105,14 @@ public class BD2KCrawler extends WebCrawler {
          String href = url.getURL().toLowerCase();	
          
          //skip filter file types by default (e.g. css, js, zip, etc.)
-         if(FILTERS.matcher(href).matches())
+         if(FILTERS.matcher(href).matches()) {
         	 return false;
+         }
          
          //only check for files in the domain (e.g. https://bd2kccc.org)
-         if(!href.startsWith(BD2KCrawler.domain))
+         if(!href.startsWith(BD2KCrawler.domain)) {
         	 return false;
+         }
          
          //skip specified urls to exclude
          for(int i = 0; i < excludedURLs.length; i++) {
@@ -155,8 +157,7 @@ public class BD2KCrawler extends WebCrawler {
             		 Digester d = new Digester(p.getCurrentContent(), currentContent);
                 	 lastDiff = d.computeHTMLDiff(); 
                 	 changes.put(url, p.getId());	// log the change
-            	 }
-            	 else {
+            	 } else {
             		 
             		 lastDiff = p.getLastDiff();	//same diff as before
             	 }
@@ -165,8 +166,7 @@ public class BD2KCrawler extends WebCrawler {
             	 p.setLastCrawlTime(lastCrawlTime);
             	 p.setLastDiff(lastDiff);
             	 p.setCurrentContent(currentContent);
-             }
-             else {
+             } else {
             	 
             	 // else create a new document to add to DB
             	 p = new org.bd2k.crawler.model.Page(
@@ -214,8 +214,7 @@ public class BD2KCrawler extends WebCrawler {
             						 Digester d = new Digester(p.getCurrentContent(), currentContent);
             						 lastDiff = d.computeHTMLDiff();
             						 changes.put(LINCS_URL + src, p.getId());
-            					 }
-            					 else {
+            					 } else {
             						 lastDiff = p.getLastDiff();
             					 }
             					 
@@ -223,8 +222,7 @@ public class BD2KCrawler extends WebCrawler {
             					 p.setLastCrawlTime(lastCrawlTime);
             	            	 p.setLastDiff(lastDiff);
             	            	 p.setCurrentContent(currentContent);
-            				 }
-            				 else {	// else add a new document
+            				 } else {	// else add a new document
             					 lastDiff = "";	
             					 p = new org.bd2k.crawler.model.Page(
             							 lastCrawlTime,
@@ -237,12 +235,10 @@ public class BD2KCrawler extends WebCrawler {
             				 // save/update
             				 pageService.savePage(p);
             				 
-            			 }
-            			 catch(UnirestException e) {
+            			 } catch(UnirestException e) {
             				 System.out.println("Error in req.asString()");
             				 e.printStackTrace();
-            			 }
-            			 catch(Exception e) {
+            			 } catch(Exception e) {
             				 e.printStackTrace();
             			 }
             		 }
@@ -332,8 +328,9 @@ public class BD2KCrawler extends WebCrawler {
     public static boolean stopCrawling() {
     	
     	// if there is no crawler, then "stopping" technically succeeds
-    	if(controller == null)
+    	if(controller == null) {
     		return true;
+    	}
     	
     	// can implement this in any way, for simplicity we will just stop
     	controller.shutdown();

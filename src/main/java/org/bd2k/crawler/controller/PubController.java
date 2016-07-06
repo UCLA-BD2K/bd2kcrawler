@@ -1,6 +1,5 @@
 package org.bd2k.crawler.controller;
 
-import java.io.IOException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -65,8 +64,7 @@ public class PubController {
 		
 		try {
 			 results = BD2KPubCrawler.crawl();
-		}
-		catch(Exception e) {
+		} catch(Exception e) {
 			e.printStackTrace();
 		}
 		
@@ -114,8 +112,7 @@ public class PubController {
 		
 		try {
 			 results = BD2KPubCrawler.crawl();
-		}
-		catch(Exception e) {
+		} catch(Exception e) {
 			e.printStackTrace();
 		}
 		
@@ -185,8 +182,7 @@ public class PubController {
 			Properties properties = PropertiesLoaderUtils.loadProperties(resource);
 			
 			Email.send(properties, recipients, subject, body, attachment);
-		}
-		catch(Exception e) {
+		} catch(Exception e) {
 			e.printStackTrace();
 		}
 		

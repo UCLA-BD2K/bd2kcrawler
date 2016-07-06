@@ -1,6 +1,5 @@
 package org.bd2k.crawler.controller;
 
-import java.io.IOException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -18,7 +17,6 @@ import org.bd2k.crawler.model.Page;
 import org.bd2k.crawler.service.CenterService;
 import org.bd2k.crawler.service.PageService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.support.PropertiesLoaderUtils;
@@ -106,8 +104,7 @@ public class NewsController {
 					//add to the email body
 					body += "\n--------Center: " + crawler.getCenterID() + "--------\n";
 					body += formatCrawlResultsForEmail(crawlerResults); 
-				}
-				catch(Exception e) {
+				} catch(Exception e) {
 					e.printStackTrace();
 				}
 			}
@@ -115,8 +112,7 @@ public class NewsController {
 			// now actually send the huge email
 			sendCrawlResultsEmail(
 					subject, body, attachment, recipients);
-		}
-		else {
+		} else {
 			return "[ ! ]: Crawler already running, please try again later.";
 		}
 		
@@ -166,17 +162,14 @@ public class NewsController {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
-			}
-			else if(crawler.getCrawlerStatus() ==  CRAWLER_RUNNING) {
+			} else if(crawler.getCrawlerStatus() ==  CRAWLER_RUNNING) {
 				return "[ ! ]: Crawler is already running, please try again later.";
-			}
-			else {
+			} else {
 				//crawler exists and is idle, so just run it
 				crawler = new BD2KCrawler(id, seedURL, seeds, excludes);
 				try {
 					crawlerResults = BD2KCrawler.crawl();
-				}
-				catch(Exception e) {
+				} catch(Exception e) {
 					e.printStackTrace();
 				}
 			}
@@ -299,8 +292,7 @@ public class NewsController {
 			Properties properties = PropertiesLoaderUtils.loadProperties(resource);
 			
 			Email.send(properties, recipients, subject, body, attachment);
-		}
-		catch(Exception e) {
+		} catch(Exception e) {
 			e.printStackTrace();
 		}
 		
