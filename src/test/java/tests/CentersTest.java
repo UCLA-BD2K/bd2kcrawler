@@ -21,7 +21,9 @@ import org.springframework.web.context.WebApplicationContext;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @WebAppConfiguration
-@ContextConfiguration(locations={"file:src/main/webapp/WEB-INF/config/servlet-config.xml"})
+@ContextConfiguration(classes = {
+		config.TestConfig.class
+		})
 public class CentersTest {
 	
 	@Autowired
