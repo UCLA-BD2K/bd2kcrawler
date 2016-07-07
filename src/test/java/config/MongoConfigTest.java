@@ -28,6 +28,8 @@ public class MongoConfigTest extends AbstractMongoConfiguration {
 	@Value("${db.dbname}")
 	String dbname;
 	
+	private static Mongo mongoClient;
+	
 	@Override
 	public String getDatabaseName() {
 		return dbname;
@@ -36,7 +38,12 @@ public class MongoConfigTest extends AbstractMongoConfiguration {
 	@Override
 	@Bean
 	public Mongo mongo() throws Exception {
-		return new MongoClient(dbHost); 
+		
+		if (mongoClient == null) {
+			mongoClient = new MongoClient(dbHost);
+		}
+		
+		return mongoClient;
 	}
 	
 	@Bean
