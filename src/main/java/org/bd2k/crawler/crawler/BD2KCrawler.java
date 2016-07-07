@@ -54,7 +54,7 @@ public class BD2KCrawler extends WebCrawler {
     private final static String LINCS_ID = "LINCS-DCIC";
     private final static String LINCS_URL = "http://lincs-dcic.org/";
     private final static Pattern FILTERS = Pattern.compile(".*(\\.(css|js|gif|jpg"
-            + "|png|mp3|mp3|zip|gz))$");
+            + "|png|mp3|mp3|zip|gz|xml))$");
     
     // members
     private static String centerID;	
@@ -110,6 +110,11 @@ public class BD2KCrawler extends WebCrawler {
          
          // only check for files in the domain (e.g. https://bd2kccc.org)
          if (!href.startsWith(BD2KCrawler.domain)) {
+        	 return false;
+         }
+         
+         // skip ical (calendars)
+         if ((href.indexOf("?ical") != -1) || (href.indexOf("embed?") > -1)) {
         	 return false;
          }
          
