@@ -28,7 +28,7 @@ a:focus, a:hover {
 #main {
 	margin-top:50px;
 }
-#nav, #sidebar {
+#nav {
 	background-color:#3b3a36;
 	position: fixed;
 	z-index:2;
@@ -64,7 +64,7 @@ a#navbar-brand:hover {
 	left:0;
 	bottom: 0;
 	top: 50px;
-	color:white;
+	color:#3b3a36;
 	border-right: 2px inset #4a4a48;
 }
 #sidebar .list-group {
@@ -97,10 +97,10 @@ a#navbar-brand:hover {
 	cursor:pointer;
 }
 #sidebar .list-group-item, #sidebar .list-group-item a {
-	color:white;
+	color:#3b3a36;
 }
 #sidebar .list-group-item.active {
-	background-color:#1D1D1B;
+	
 }
 .ui-accordion {
 	
