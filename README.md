@@ -62,7 +62,7 @@ After this, you are set to login and access all services from the site.
 Note*: In src/main/resources/app.properties, there is a property named email.recipients that contains the comma separated list of email addresses to send crawl results to. Please update this value before initiating any crawls. E.g. 
 
 ```bash
-email.properties=person2@gmail.com,person3@gmail.com,person4@gmail.com
+email.recipients=person2@email.com,person3@email.com,person4@email.com
 ```
 
 ##License
