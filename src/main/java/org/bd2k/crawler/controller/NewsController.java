@@ -17,6 +17,8 @@ import org.bd2k.crawler.model.Page;
 import org.bd2k.crawler.service.CenterService;
 import org.bd2k.crawler.service.PageService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.PropertySource;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.support.PropertiesLoaderUtils;
@@ -40,12 +42,15 @@ public class NewsController {
 	@Autowired
 	private CenterService centerService;
 	
+	@Value("${email.recipients}")
+	private String emailRecipients;		// comma separated emails (no spaces)
+	
 	// class crawler
 	private static BD2KCrawler crawler;
 	
 	private final int CRAWLER_RUNNING = 1;
 	private final int CRAWLER_IDLE = 0;
-	private final String host = "127.0.0.1:8080/BD2KCrawler";
+	private final String host = "127.0.0.1:8080/BD2KCrawler";	// for email, change to domain
 		
 	/**
 	 * Checks all websites and checks if there are any changes since the last check. 
@@ -77,7 +82,12 @@ public class NewsController {
 			
 			// generate email contents
 			List<String> recipients = new ArrayList<String>();
-			recipients.add("alm.gong@gmail.com");	// temp, until we decide
+			
+			String[] recipientArr = emailRecipients.split(",");
+			for(int i = 0 ; i < recipientArr.length; i++) {
+				recipients.add(recipientArr[i]);
+			}
+			
 			String subject = "[BD2K Crawler] Results for crawl";
 			String header = "Request /news/update\n";
 			header += "Crawl initiated on: " + crawlStartTime + "\n";
@@ -175,7 +185,12 @@ public class NewsController {
 			
 			// generate email contents
 			List<String> recipients = new ArrayList<String>();
-			recipients.add("alm.gong@gmail.com");	//temp, until we decide
+			
+			String[] recipientArr = emailRecipients.split(",");
+			for(int i = 0 ; i < recipientArr.length; i++) {
+				recipients.add(recipientArr[i]);
+			}
+			
 			String subject = "[BD2K Crawler] Results for crawl";
 			String header = "Request /news/update/" + id + "\n";
 			header += "Crawl initiated on: " + crawlStartTime + "\n";
@@ -233,7 +248,7 @@ public class NewsController {
 	 */
 	@RequestMapping(value="/news/crawlerStatus")
 	public String getCrawlerStatus() {
-		
+
 		int status = new BD2KCrawler().getCrawlerStatus();
 		
 		if (status == CRAWLER_RUNNING) {

@@ -16,6 +16,7 @@ import org.bd2k.crawler.crawler.Email;
 import org.bd2k.crawler.model.PublicationResult;
 import org.bd2k.crawler.service.PublicationService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.support.PropertiesLoaderUtils;
@@ -25,7 +26,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
- * Handles requests for /pub, may initate crawling.
+ * Handles requests for /pub, may initiate crawling.
  * @author allengong
  *
  */
@@ -34,6 +35,9 @@ public class PubController {
 	
 	@Autowired 
 	PublicationService publicationService;
+	
+	@Value("${email.recipients}")
+	private String emailRecipients;		// comma separated emails (no spaces)
 	
 	private final int CRAWLER_RUNNING = 1;
 	private final int CRAWLER_IDLE = 0;
@@ -70,7 +74,12 @@ public class PubController {
 		
 		// send email with the changes
 		List<String> recipients = new ArrayList<String>();
-		recipients.add("alm.gong@gmail.com");	// temp, until we decide
+		
+		String[] recipientArr = emailRecipients.split(",");
+		for(int i = 0 ; i < recipientArr.length; i++) {
+			recipients.add(recipientArr[i]);
+		}
+		
 		String subject = "[BD2K PubCrawler] Results for crawl";
 		String header = "Request /pub/update\n";
 		header += "Crawl initiated on: " + crawlStartTime + "\n";
@@ -118,7 +127,12 @@ public class PubController {
 		
 		// send email with the changes
 		List<String> recipients = new ArrayList<String>();
-		recipients.add("alm.gong@gmail.com");	// temp, until we decide
+		
+		String[] recipientArr = emailRecipients.split(",");
+		for(int i = 0 ; i < recipientArr.length; i++) {
+			recipients.add(recipientArr[i]);
+		}
+		
 		String subject = "[BD2K PubCrawler] Results for crawl";
 		String header = "Request /pub/update/" + id + "\n";
 		header += "Crawl initiated on: " + crawlStartTime + "\n";
@@ -148,8 +162,6 @@ public class PubController {
 	@RequestMapping(value="/pub/changes/{id}", method=RequestMethod.GET)
 	public PublicationResult getPubChangesForId(HttpServletResponse res,
 			@PathVariable("id") String id) {
-		
-		System.out.println("grabbing diffs for just center: " + id);
 		
 		return publicationService.getPublicationResultByCenterID(id);
 		
