@@ -58,3 +58,13 @@ We need to create a new database named BD2KCrawlerDB, and a collection named "Us
 Note that it is important to use a BCRYPT hashed password, as the authentication service (spring-security) is configured to hash input passwords automatically. Use something like [BCrypt Hash Generator](http://bcrypthashgenerator.apphb.com/) to quickly obtain some hash.
 
 After this, you are set to login and access all services from the site.
+
+Note*: In src/main/resources/app.properties, there is a property named email.recipients that contains the comma separated list of email addresses to send crawl results to. Please update this value before initiating any crawls. E.g. 
+
+```bash
+email.properties=person2@gmail.com,person3@gmail.com,person4@gmail.com
+```
+
+##License
+
+--
