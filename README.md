@@ -13,25 +13,25 @@ If you have not already, install [Maven](https://maven.apache.org/) and [Apache 
 
 To verify that Maven is correctly installed, run:
 
-'''bash
+```bash
 mvn -v
-'''
+```
 
 And you should see the Maven version number as well as other metadata, such as the home directory for Maven and the Java version found.
 
 Now that Maven is installed, head over to the root directory of the project and run
 
-'''bash
+```bash
 mvn compile
-'''
+```
 
 in order to compile the project source code. The default location of the .class files will be in the target/** directory. This step is good for a sanity check that there are no compilation errors, but overall, this is optional.
 
 To compile and package the result into a WAR file for Tomcat deployment, run
 
-'''bash
+```bash
 mvn package
-'''
+```
 
 This should compile, run tests, and package the compiled bytecode into a WAR file located in the target/** directory.
 
@@ -45,7 +45,7 @@ Though the build dependencies should be ready to go, there is one more thing to 
 
 We need to create a new database named BD2KCrawlerDB, and a collection named "Users". Add a minimal document 
 
-'''javascript
+```javascript
 {
 firstName:"",
 lastName:"",
@@ -53,7 +53,7 @@ email:"test@email.com",
 password:"<Some BCRYPT hashed password>",
 role: "ROLE_ADMIN" 
 }
-''' 
+```
 
 Note that it is important to use a BCRYPT hashed password, as the authentication service (spring-security) is configured to hash input passwords automatically. Use something like [BCrypt Hash Generator](http://bcrypthashgenerator.apphb.com/) to quickly obtain some hash.
 
