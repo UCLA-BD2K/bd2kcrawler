@@ -47,11 +47,11 @@ We need to create a new database named BD2KCrawlerDB, and a collection named "Us
 
 ```javascript
 {
-firstName:"",
-lastName:"",
-email:"test@email.com",
-password:"<Some BCRYPT hashed password>",
-role: "ROLE_ADMIN" 
+	firstName:"",
+	lastName:"",
+	email:"test@email.com",
+	password:"<Some BCRYPT hashed password>",
+	role: "ROLE_ADMIN" 
 }
 ```
 
