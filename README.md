@@ -1,5 +1,5 @@
 #BD2K Crawler
-## Description:
+## Description
 
 Spring MVC Web project that provides crawling services on all BD2K websites as of June 2016 and center publications found on PubMed. There are two separate crawlers for each service and they can be ran in parallel (but multiple instances of the same crawler cannot be running). Utilizes [Crawler4j](https://github.com/yasserg/crawler4j) for crawling web pages.
 
