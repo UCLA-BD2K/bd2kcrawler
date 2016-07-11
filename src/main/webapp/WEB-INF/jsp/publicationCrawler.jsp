@@ -39,7 +39,7 @@
           			<hr />
           			
           			<div>
-          				<h3>Initiate Site Crawls</h3>
+          				<h3>Initiate Publication Crawls</h3>
           				<div class="">
           					Crawl Publications for all centers: <br/>
           					<button type="button" class="btn btn-default" id="crawl-all-btn">Start crawler</button><span id="crawl-all-loading"></span> <br /><br />
@@ -180,11 +180,12 @@
 			if(!crawlerRunning) {
 				
 				crawlerRunning = true;
-				var center = $('#center-select option:selected').val();
+				var center = $('#crawl-center-select option:selected').val();
 				var crawlUrl = '/BD2KCrawler/pub/update';
 				if(center != "all") {
 					crawlUrl += ('/' + center);
 				}
+								
 				$.ajax({
 					url: crawlUrl,
 					success:function(d) {
