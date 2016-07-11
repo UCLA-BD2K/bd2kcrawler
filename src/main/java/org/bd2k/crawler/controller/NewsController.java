@@ -1,5 +1,6 @@
 package org.bd2k.crawler.controller;
 
+import java.security.Principal;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -18,7 +19,6 @@ import org.bd2k.crawler.service.CenterService;
 import org.bd2k.crawler.service.PageService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.annotation.PropertySource;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.support.PropertiesLoaderUtils;
@@ -57,10 +57,8 @@ public class NewsController {
 	 * If the process is already running, it should return the status.
 	 */
 	@RequestMapping(value="/news/update", method=RequestMethod.GET)
-	public String getNewCrawlData(HttpServletResponse res) {
-		
-		System.out.println("running crawler on all sites...");
-		
+	public String getNewCrawlData(Principal p) {
+			
 		List<Center> centers = centerService.getAllCenters();
 		String[] seeds = new String[centers.size()];
 		String[] excludes = {};
@@ -84,8 +82,13 @@ public class NewsController {
 			List<String> recipients = new ArrayList<String>();
 			
 			String[] recipientArr = emailRecipients.split(",");
-			for(int i = 0 ; i < recipientArr.length; i++) {
+			for (int i = 0 ; i < recipientArr.length; i++) {
 				recipients.add(recipientArr[i]);
+			}
+			
+			// add the current user that initiated crawling if not in list
+			if (!recipients.contains(p.getName())) {
+				recipients.add(p.getName());
 			}
 			
 			String subject = "[BD2K Crawler] Results for crawl";
@@ -133,11 +136,9 @@ public class NewsController {
 	 * Only checks the website associated with {id}.
 	 */
 	@RequestMapping(value="/news/update/{id}", method=RequestMethod.GET) 
-	public String getNewCrawlDataForId(HttpServletResponse res, 
+	public String getNewCrawlDataForId(Principal p, 
 			@PathVariable("id") String id) {
-		
-		System.out.println("running crawler for centerID: " + id);
-		
+
 		List<Center> centers = centerService.getAllCenters();
 		String seedURL = null;
 		for (Center c : centers) {
@@ -187,8 +188,13 @@ public class NewsController {
 			List<String> recipients = new ArrayList<String>();
 			
 			String[] recipientArr = emailRecipients.split(",");
-			for(int i = 0 ; i < recipientArr.length; i++) {
+			for (int i = 0 ; i < recipientArr.length; i++) {
 				recipients.add(recipientArr[i]);
+			}
+			
+			// add the current user that initiated crawling if not in list
+			if (!recipients.contains(p.getName())) {
+				recipients.add(p.getName());
 			}
 			
 			String subject = "[BD2K Crawler] Results for crawl";
