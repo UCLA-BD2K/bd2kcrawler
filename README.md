@@ -65,6 +65,25 @@ Note*: In src/main/resources/app.properties, there is a property named email.rec
 email.recipients=person2@email.com,person3@email.com,person4@email.com
 ```
 
+###Misc
+Currently, the crawler is publicly available at: http://old.bd2kccc.org:8080/BD2KCrawler/index
+
+###Deployment & Encountered issues
+After specifying the desired deployment options in pom.xml, you can run:
+
+```bash
+mvn deploy
+```
+
+to deploy the application directly to your destination server.
+
+Encountered issues and their fixes:
+
+1. Tomcat server down (connection refused at URL + port)
+    This actually is not related to our application, but you can 
+    head over to the tomcat installtion directory (e.g. /usr/share/ for 
+    AWS Linux AMIs) and run the start/stop scripts as needed.
+
 ##License
 
 --
